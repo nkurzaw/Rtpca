@@ -1,0 +1,33 @@
+---
+title: "Introduction to Rtpca"
+author: "Nils Kurzawa"
+date: "12/13/2019"
+package: Rtpca
+output:
+    BiocStyle::html_document
+vignette: >
+    %\VignetteIndexEntry{Introduction to Rtpca}
+    %\VignetteEngine{knitr::rmarkdown}
+    %VignetteEncoding{UTF-8}
+bibliography: bibliography.bib
+csl: cell.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(TPP)
+library(Rtpca)
+```
+
+```{r}
+data("hdacTR_smallExample")
+```
+
+```{r}
+trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data)
+```
+
+
