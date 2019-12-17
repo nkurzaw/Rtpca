@@ -9,8 +9,6 @@ vignette: >
     %\VignetteIndexEntry{Introduction to Rtpca}
     %\VignetteEngine{knitr::rmarkdown}
     %VignetteEncoding{UTF-8}
-bibliography: bibliography.bib
-csl: cell.csl
 ---
 
 ```{r setup, include=FALSE}

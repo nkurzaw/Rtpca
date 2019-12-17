@@ -2,6 +2,7 @@
 ## library(Rtpca); library(testthat)
 context(".getCommonRownames")
 
+library(dplyr)
 library(Biobase)
 
 m1 <- matrix(1:12, ncol = 4)

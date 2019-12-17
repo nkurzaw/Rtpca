@@ -7,6 +7,7 @@
 #         })
 # }
 
+#' @import Biobase 
 .getCommonRownames <- function(objList, rownameCol = NULL){
     if(class(objList[[1]])[1] == "ExpressionSet"){
         return(Reduce(intersect, lapply(objList, function(x) 
