@@ -1,3 +1,7 @@
+## Tests for .getCommonRownames
+## library(Rtpca); library(testthat)
+context(".getMatList")
+
 library(dplyr)
 library(Biobase)
 
@@ -26,7 +30,7 @@ mat_list_new <- list(
 )
 
 expect_identical(
-    .getMatList(mat_list, commonRownames = c("2", "3")),
+    Rtpca:::.getMatList(mat_list, commonRownames = c("2", "3")),
     mat_list_new
 )
 
@@ -37,7 +41,7 @@ df_list <- list(
 )
 
 expect_equal(
-    .getMatList(df_list, commonRownames = c("2", "3")), 
+    Rtpca:::.getMatList(df_list, commonRownames = c("2", "3")), 
     mat_list_new
 )
 
@@ -54,7 +58,26 @@ tbl_list <- list(
 )
 
 expect_identical(
-    .getMatList(tbl_list, commonRownames = c(2, 3),
+    Rtpca:::.getMatList(tbl_list, commonRownames = c(2, 3),
                 rownameCol = "gene_name"), 
     mat_list_new
+)
+
+expr1 <- ExpressionSet(m1)
+expr2 <- ExpressionSet(m2)
+expr3 <- ExpressionSet(m3)
+
+exprSet_list <- list(
+    expr1, expr2, expr3
+)
+
+expect_identical(
+    Rtpca:::.getMatList(exprSet_list, commonRownames = c(2, 3)), 
+    mat_list_new
+)
+
+expect_error(
+    Rtpca:::.getMatList(c("2", "3"), commonRownames = c(2, 3)), 
+    paste("getMatList: Supplied object is neither", 
+          "ExpressionSet nor matrix or data.frame!")
 )
