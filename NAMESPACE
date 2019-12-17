@@ -2,4 +2,6 @@
 
 import(Biobase)
 importFrom(dplyr,filter)
+importFrom(dplyr,one_of)
 importFrom(dplyr,select)
+importFrom(stats,median)

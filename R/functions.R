@@ -27,6 +27,7 @@
 
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
+#' @importFrom dplyr one_of
 .getMatList <- function(objList, commonRownames, rownameCol = NULL){
     if(class(objList[[1]])[1] == "ExpressionSet"){
         return(lapply(objList, function(x){
@@ -40,8 +41,10 @@
     }else if((class(objList[[1]])[1] %in% c("tbl_df")) & 
              !is.null(rownameCol)){
         return(lapply(objList, function(x){
-            x_fil <- filter(x, eval(parse(text = rownameCol)) %in% commonRownames) 
-            x_mat <- as.matrix(dplyr::select(x_fil, -one_of(rownameCol)))
+            x_fil <- filter(x, eval(parse(text = rownameCol)) %in% 
+                                commonRownames) 
+            x_mat <- as.matrix(dplyr::select(x_fil, 
+                                             -one_of(rownameCol)))
             rownames(x_mat) <- x_fil[[rownameCol]]
             return(x_mat)
         }))
@@ -51,6 +54,19 @@
     }
 }
 
-# .getSummarizedMat <- function(matList, FUN = median){
-#     
-# }
+.checkMatDims <- function(matList){
+    if(length(Reduce(intersect, lapply(matList, dim))) != 2){
+        stop("checkMatDims: unequal matrix dimensions!")
+    }
+}
+
+#' @importFrom stats median
+.getSummarizedMat <- function(matList, FUN = median){
+    .checkMatDims(matList)
+    arr <- array(unlist(matList), 
+                 c(dim(matList[[1]]), length(matList)))
+    sumMat <- apply(arr, seq_len(2), FUN)
+    rownames(sumMat) <- rownames(matList[[1]])
+    colnames(sumMat) <- colnames(matList[[1]])
+    return(sumMat)
+}
