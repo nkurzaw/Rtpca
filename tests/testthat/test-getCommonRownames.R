@@ -7,11 +7,11 @@ library(Biobase)
 
 m1 <- matrix(1:12, ncol = 4)
 m2 <- matrix(2:13, ncol = 4)
-m3 <- matrix(c(2:10, 1:3), ncol = 4)
+m3 <- matrix(c(2:10, 1:7), ncol = 4)
 
 rownames(m1) <- 1:3
 rownames(m2) <- 2:4
-rownames(m3) <- 2:4
+rownames(m3) <- 2:5
 
 mat_list <- list(
     m1, m2, m3
@@ -42,7 +42,7 @@ tbl_list <- list(
         mutate(gene_name = 2:4), 
     data.frame(m3) %>% 
         tbl_df %>% 
-        mutate(gene_name = 2:4)
+        mutate(gene_name = 2:5)
 )
 
 expect_identical(
