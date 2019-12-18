@@ -1,11 +1,65 @@
-# createEuclDistMat <- function(objList){
-#     common_rownames <- 
-#         getCommonRownames(objList)
-#     exprs_list <- lapply(trData, function(x){
-#             e_mat <- exprs(x)
-#             e_mat[rownames(e_mat) %in% common_rownames,]
-#         })
-# }
+#' Create distance matrix of all vs all protein 
+#' melting profiles
+#' 
+#' @param objList list of objects suitable for the analysis,
+#' currently allowed classes of objects are: matrices,
+#' data.frames, tibbles and ExpressionSets
+#' @param rownameCol in case the input objects are tibbles
+#' this parameter takes in the name (character) of the column 
+#' specifying protein names or ids
+#' @param summaryFun function to use to summarize measurements
+#' across replicates, default is median
+#' @param distMethod method to use within dist function,
+#' default is 'euclidean'
+#' 
+#' @return a distance matrix of all pairwise protein
+#' melting profiles
+#' 
+#' @examples 
+#' m1 <- matrix(1:12, ncol = 4)
+#' m2 <- matrix(2:13, ncol = 4)
+#' m3 <- matrix(c(2:10, 1:7), ncol = 4)
+#' 
+#' rownames(m1) <- 1:3
+#' rownames(m2) <- 2:4
+#' rownames(m3) <- 2:5
+#' 
+#' colnames(m1) <- paste0("X", 1:4)
+#' colnames(m2) <- paste0("X", 1:4)
+#' colnames(m3) <- paste0("X", 1:4)
+#' 
+#' mat_list <- list(
+#'     m1, m2, m3
+#' )
+#' 
+#' createEuclDistMat(mat_list)
+#' 
+#' expr1 <- ExpressionSet(m1)
+#' expr2 <- ExpressionSet(m2)
+#' expr3 <- ExpressionSet(m3)
+#' 
+#' exprSet_list <- list(
+#'     expr1, expr2, expr3
+#' )
+#' 
+#' createEuclDistMat(exprSet_list)
+#' 
+#' @export
+#' @importFrom stats dist
+createEuclDistMat <- function(objList, rownameCol = NULL, 
+                              summaryFun = median,
+                              distMethod = "euclidean"){
+    common_rownames <-
+        .getCommonRownames(objList, rownameCol = rownameCol)
+    mat_list <- .getMatList(objList, 
+                            commonRownames = common_rownames,
+                            rownameCol = rownameCol)
+    summarized_mat <- .getSummarizedMat(matList = mat_list,
+                                        FUN = summaryFun)
+    dist_mat <- as.matrix(dist(summarized_mat,
+                               method = distMethod))
+    return(dist_mat)
+}
 
 #' @import Biobase 
 .getCommonRownames <- function(objList, rownameCol = NULL){

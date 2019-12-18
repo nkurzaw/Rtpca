@@ -40,7 +40,7 @@ df_list <- list(
     data.frame(m3)
 )
 
-expect_equal(
+expect_identical(
     Rtpca:::.getMatList(df_list, commonRownames = c("2", "3")), 
     mat_list_new
 )
