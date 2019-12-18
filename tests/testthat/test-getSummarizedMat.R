@@ -33,11 +33,11 @@ rownames(ctrl_m) <- c("2", "3")
 colnames(ctrl_m) <- paste0("X", 1:4)
 
 expect_equal(
-    Rtpca::.getSummarizedMat(mat_list_new),
+    Rtpca:::.getSummarizedMat(mat_list_new),
     ctrl_m
 )
 
 expect_error(
-    Rtpca::.getSummarizedMat(mat_list),
+    Rtpca:::.getSummarizedMat(mat_list),
     "checkMatDims: unequal matrix dimensions!"
 )
