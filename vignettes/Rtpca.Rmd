@@ -32,8 +32,5 @@ trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data)
 trDataNorm <- tpptrNormalize(data = trData)
 ```
 
-```{r}
-createEuclDistMat(trDataNorm$normData)
-```
 
 
