@@ -1,7 +1,7 @@
 ---
 title: "Introduction to Rtpca"
 author: "Nils Kurzawa"
-date: "12/13/2019"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 package: Rtpca
 output:
     BiocStyle::html_document
@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(TPP)
 library(Rtpca)
 ```
@@ -26,6 +26,14 @@ data("hdacTR_smallExample")
 
 ```{r}
 trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data)
+```
+
+```{r}
+trDataNorm <- tpptrNormalize(data = trData)
+```
+
+```{r}
+createEuclDistMat(trDataNorm$normData)
 ```
 
 

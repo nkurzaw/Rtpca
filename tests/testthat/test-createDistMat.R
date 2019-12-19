@@ -1,6 +1,6 @@
-## Tests for .getCommonRownames
+## Tests for createDistMat
 ## library(Rtpca); library(testthat)
-context("createEuclDistMat")
+context("createDistMat")
 
 library(dplyr)
 library(Biobase)
@@ -27,7 +27,7 @@ rownames(ctrl_dist_mat) <-
     colnames(ctrl_dist_mat) <- c("2", "3")
 
 expect_identical(
-    createEuclDistMat(mat_list),
+    createDistMat(mat_list),
     ctrl_dist_mat
 )
 
@@ -40,7 +40,7 @@ exprSet_list <- list(
 )
 
 expect_identical(
-    createEuclDistMat(exprSet_list),
+    createDistMat(exprSet_list),
     ctrl_dist_mat
 )
 
@@ -51,7 +51,7 @@ df_list <- list(
 )
 
 expect_identical(
-    createEuclDistMat(exprSet_list), 
+    createDistMat(exprSet_list), 
     ctrl_dist_mat
 )
 
@@ -68,7 +68,7 @@ tbl_list <- list(
 )
 
 expect_identical(
-    createEuclDistMat(tbl_list, 
+    createDistMat(tbl_list, 
                       rownameCol = "gene_name"), 
     ctrl_dist_mat
 )

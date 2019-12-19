@@ -1,3 +1,57 @@
+#' Run the TPCA analysis
+#' 
+#' @param objList inout list of objects, e.g.
+#' ExpressionSets retrieved after TPP data import
+#' or matrices or data frames
+#' @param complexAnno data frame annotating
+#' known protein complexes of interest to test 
+#' @param ppiAnno data frame annotation known
+#' protein-protein interactions (PPI) to test 
+#' @param rownameCol in case the input objects are tibbles
+#' this parameter takes in the name (character) of the column 
+#' specifying protein names or ids
+#' @param summaryFun function to use to summarize measurements
+#' across replicates, default is median
+#' @param distMethod method to use within dist function,
+#' default is 'euclidean'
+#' @param stringScore score cutoff to filter
+#' PPIs retrieved from StringDb
+#' 
+#' @return an object of class tpcaResult
+#' with the following slots:
+#' 1) ObjList: containing the supplied list of
+#' objects
+#' 
+#'  @export
+#'  
+#' @examples  
+runTPCA <- function(objList, 
+                    complexAnno = NULL,
+                    ppiAnno = NULL,
+                    rownameCol = NULL,
+                    summaryFUN = median,
+                    distMethod = "euclidean",
+                    stringScore = 700){
+    tpcaObj <- .checkAnnoArguments(
+        objList = objList,
+        complexAnno = complexAnno,
+        ppiAnno = ppiAnno
+    )
+    tpcaObj@DistMat <- createDistMat(
+        objList = tpcaObj@ObjList, 
+        rownameCol = rownameCol, 
+        summaryFun = summaryFUN,
+        distMethod = distMethod
+    )
+    if(!is.null(ppiAnno)){
+        tpcaObj <- .createPPiRocTable(
+            tpcaObj = tpcaObj,
+            stringScore = stringScore
+        )
+    }
+    return(tpcaObj)
+}
+
 #' Create distance matrix of all vs all protein 
 #' melting profiles
 #' 
@@ -32,7 +86,7 @@
 #'     m1, m2, m3
 #' )
 #' 
-#' createEuclDistMat(mat_list)
+#' createDistMat(mat_list)
 #' 
 #' expr1 <- ExpressionSet(m1)
 #' expr2 <- ExpressionSet(m2)
@@ -42,13 +96,13 @@
 #'     expr1, expr2, expr3
 #' )
 #' 
-#' createEuclDistMat(exprSet_list)
+#' createDistMat(exprSet_list)
 #' 
 #' @export
 #' @importFrom stats dist
-createEuclDistMat <- function(objList, rownameCol = NULL, 
-                              summaryFun = median,
-                              distMethod = "euclidean"){
+createDistMat <- function(objList, rownameCol = NULL, 
+                           summaryFun = median,
+                           distMethod = "euclidean"){
     common_rownames <-
         .getCommonRownames(objList, rownameCol = rownameCol)
     mat_list <- .getMatList(objList, 
@@ -61,7 +115,72 @@ createEuclDistMat <- function(objList, rownameCol = NULL,
     return(dist_mat)
 }
 
-#' @import Biobase 
+
+.createlDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
+                                   summaryFun = median,
+                                   distMethod = "euclidean"){
+    tpcaObj@
+    tpcaObj@DistMat <- createDistMat(
+        objList = tpcaObj@ObjList, 
+        rownameCol = rownameCol, 
+        summaryFun = summaryFUN,
+        distMethod = distMethod
+    )
+    return(tpcaObj)
+}
+
+
+.checkAnnoArguments <- function(objList, complexAnno = NULL,
+                                ppiAnno = NULL){
+    if(is.null(complexAnno) & is.null(ppiAnno)){
+        stop(paste(c("Neither complex annotation nor a PPI", 
+                     "annotation were supplied!\n",
+                     "One of them is required."),
+                   collapse = " "))
+    }else if(!is.null(complexAnno) & !is.null(ppiAnno)){
+        tpcaObj <- tpcaResult(ObjList = objList,
+                              ComplexAnnotation = complexAnno)
+        return(tpcaObj)
+    }else if(!is.null(complexAnno)){
+        tpcaObj <- tpcaResult(ObjList = objList,
+                              ComplexAnnotation = complexAnno)
+        return(tpcaObj)
+    }else if(!is.null(ppiAnno)){
+        tpcaObj <- tpcaResult(ObjList = objList,
+                              PPiAnnotation = ppiAnno)
+        return(tpcaObj)
+    }
+}
+
+#' @import dplyr
+#' @import tidyr
+.createPPiRocTable <- function(tpcaObj, stringScore = 700){
+    dist_df <- tpcaObj@DistMat %>% 
+        tbl_df %>% 
+        mutate(rowname = rownames(tpcaObj@DistMat)) %>% 
+        gather(colname, value, -rowname) %>% 
+        rowwise() %>% 
+        mutate(pair = paste(sort(c(rowname, colname)), 
+                            collapse = ":")) %>% 
+        ungroup %>% 
+        filter(rowname != colname,
+               !duplicated(pair)) %>% 
+        arrange(value) %>% 
+        mutate(annotated = pair %in% 
+                   filter(tpcaTest@PPiAnnotation, 
+                          combined_score >= stringScore)$pair) %>% 
+        mutate(TPR = cumsum(as.numeric(annotated)) / 
+                    sum(as.numeric(annotated)), 
+               FPR = cumsum(as.numeric(annotated == FALSE)) / 
+                   (n() - cumsum(as.numeric(value != 0)) +  
+                        cumsum(as.numeric(annotated == FALSE))))
+    
+    tpcaObj@PPiRocTable <- dist_df
+    return(tpcaObj)
+}
+
+
+#' @importFrom Biobase ExpressionSet
 .getCommonRownames <- function(objList, rownameCol = NULL){
     if(class(objList[[1]])[1] == "ExpressionSet"){
         return(Reduce(intersect, lapply(objList, function(x) 

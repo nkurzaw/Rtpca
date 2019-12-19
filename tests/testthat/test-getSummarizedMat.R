@@ -1,4 +1,4 @@
-## Tests for .getCommonRownames
+## Tests for .getSummarizedMat
 ## library(Rtpca); library(testthat)
 context(".getSummarizedMat")
 
