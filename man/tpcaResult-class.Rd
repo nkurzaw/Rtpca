@@ -28,6 +28,12 @@ S4 TPCA Result Class
 \item{\code{ComplexAnnotation}}{data.frame.}
 
 \item{\code{PPiAnnotation}}{data.frame.}
+
+\item{\code{PPiRocTable}}{data.frame.}
+
+\item{\code{summaryFUN}}{function.}
+
+\item{\code{distMethod}}{character.}
 }}
 
 \examples{
@@ -42,5 +48,5 @@ rownames(m3) <- 2:5
 mat_list <- list(
     m1, m2, m3
 )
-tpcaObj <- tpcaResult(ObjList = mat_list)
+tpcaObj <- new("tpcaResult", ObjList = mat_list)
 }

@@ -10,7 +10,7 @@
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids
-#' @param summaryFun function to use to summarize measurements
+#' @param summaryFUN function to use to summarize measurements
 #' across replicates, default is median
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
@@ -25,6 +25,33 @@
 #'  @export
 #'  
 #' @examples  
+#' m1 <- matrix(1:12, ncol = 4)
+#' m2 <- matrix(2:13, ncol = 4)
+#' m3 <- matrix(c(2:10, 1:7), ncol = 4)
+#' 
+#' rownames(m1) <- 1:3
+#' rownames(m2) <- 2:4
+#' rownames(m3) <- 2:5
+#' 
+#' colnames(m1) <- paste0("X", 1:4)
+#' colnames(m2) <- paste0("X", 1:4)
+#' colnames(m3) <- paste0("X", 1:4)
+#' 
+#' mat_list <- list(
+#'     m1, m2, m3
+#' )
+#' 
+#' ppi_anno <- tibble(
+#'     gene_name1 = "2",
+#'     gene_name2 = "3",
+#'     combined_score = 700,
+#'     pair = "2:3")
+#' 
+#' runTPCA(
+#'     objList = mat_list,
+#'     complexAnno = NULL,
+#'     ppiAnno = ppi_anno
+#' )
 runTPCA <- function(objList, 
                     complexAnno = NULL,
                     ppiAnno = NULL,
@@ -37,10 +64,10 @@ runTPCA <- function(objList,
         complexAnno = complexAnno,
         ppiAnno = ppiAnno
     )
-    tpcaObj@DistMat <- createDistMat(
-        objList = tpcaObj@ObjList, 
+    tpcaObj <- .createDistMatTpcaObj(
+        tpcaObj = tpcaObj, 
         rownameCol = rownameCol, 
-        summaryFun = summaryFUN,
+        summaryFUN = summaryFUN,
         distMethod = distMethod
     )
     if(!is.null(ppiAnno)){
@@ -61,7 +88,7 @@ runTPCA <- function(objList,
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids
-#' @param summaryFun function to use to summarize measurements
+#' @param summaryFUN function to use to summarize measurements
 #' across replicates, default is median
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
@@ -101,7 +128,7 @@ runTPCA <- function(objList,
 #' @export
 #' @importFrom stats dist
 createDistMat <- function(objList, rownameCol = NULL, 
-                           summaryFun = median,
+                           summaryFUN = median,
                            distMethod = "euclidean"){
     common_rownames <-
         .getCommonRownames(objList, rownameCol = rownameCol)
@@ -109,27 +136,28 @@ createDistMat <- function(objList, rownameCol = NULL,
                             commonRownames = common_rownames,
                             rownameCol = rownameCol)
     summarized_mat <- .getSummarizedMat(matList = mat_list,
-                                        FUN = summaryFun)
+                                        FUN = summaryFUN)
     dist_mat <- as.matrix(dist(summarized_mat,
                                method = distMethod))
     return(dist_mat)
 }
 
 
-.createlDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
-                                   summaryFun = median,
+.createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
+                                   summaryFUN = median,
                                    distMethod = "euclidean"){
-    tpcaObj@
+    tpcaObj@summaryFUN <- summaryFUN
+    tpcaObj@distMethod <- distMethod
     tpcaObj@DistMat <- createDistMat(
         objList = tpcaObj@ObjList, 
         rownameCol = rownameCol, 
-        summaryFun = summaryFUN,
+        summaryFUN = summaryFUN,
         distMethod = distMethod
     )
     return(tpcaObj)
 }
 
-
+#' @importFrom methods new
 .checkAnnoArguments <- function(objList, complexAnno = NULL,
                                 ppiAnno = NULL){
     if(is.null(complexAnno) & is.null(ppiAnno)){
@@ -138,16 +166,19 @@ createDistMat <- function(objList, rownameCol = NULL,
                      "One of them is required."),
                    collapse = " "))
     }else if(!is.null(complexAnno) & !is.null(ppiAnno)){
-        tpcaObj <- tpcaResult(ObjList = objList,
-                              ComplexAnnotation = complexAnno)
+        tpcaObj <- new("tpcaResult",
+                       ObjList = objList,
+                       ComplexAnnotation = complexAnno)
         return(tpcaObj)
     }else if(!is.null(complexAnno)){
-        tpcaObj <- tpcaResult(ObjList = objList,
-                              ComplexAnnotation = complexAnno)
+        tpcaObj <- new("tpcaResult",
+                       ObjList = objList,
+                       ComplexAnnotation = complexAnno)
         return(tpcaObj)
     }else if(!is.null(ppiAnno)){
-        tpcaObj <- tpcaResult(ObjList = objList,
-                              PPiAnnotation = ppiAnno)
+        tpcaObj <- new("tpcaResult",
+                       ObjList = objList,
+                       PPiAnnotation = ppiAnno)
         return(tpcaObj)
     }
 }
@@ -155,6 +186,9 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' @import dplyr
 #' @import tidyr
 .createPPiRocTable <- function(tpcaObj, stringScore = 700){
+    colname <- value <- rowname <- pair <- combined_score <- 
+        annotated <- NULL
+    
     dist_df <- tpcaObj@DistMat %>% 
         tbl_df %>% 
         mutate(rowname = rownames(tpcaObj@DistMat)) %>% 
@@ -167,7 +201,7 @@ createDistMat <- function(objList, rownameCol = NULL,
                !duplicated(pair)) %>% 
         arrange(value) %>% 
         mutate(annotated = pair %in% 
-                   filter(tpcaTest@PPiAnnotation, 
+                   filter(tpcaObj@PPiAnnotation, 
                           combined_score >= stringScore)$pair) %>% 
         mutate(TPR = cumsum(as.numeric(annotated)) / 
                     sum(as.numeric(annotated)), 
@@ -181,6 +215,7 @@ createDistMat <- function(objList, rownameCol = NULL,
 
 
 #' @importFrom Biobase ExpressionSet
+#' @importFrom Biobase exprs
 .getCommonRownames <- function(objList, rownameCol = NULL){
     if(class(objList[[1]])[1] == "ExpressionSet"){
         return(Reduce(intersect, lapply(objList, function(x) 
@@ -201,6 +236,8 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr one_of
+#' @importFrom Biobase ExpressionSet
+#' @importFrom Biobase exprs
 .getMatList <- function(objList, commonRownames, rownameCol = NULL){
     if(class(objList[[1]])[1] == "ExpressionSet"){
         return(lapply(objList, function(x){

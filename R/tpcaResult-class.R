@@ -6,6 +6,9 @@
 #' @slot ContrastDistMat matrix.
 #' @slot ComplexAnnotation data.frame.
 #' @slot PPiAnnotation data.frame.
+#' @slot PPiRocTable data.frame.
+#' @slot summaryFUN function.
+#' @slot distMethod character.
 #'
 #' @return an object of class tpcaResult
 #' with the following slots:
@@ -26,7 +29,7 @@
 #' mat_list <- list(
 #'     m1, m2, m3
 #' )
-#' tpcaObj <- tpcaResult(ObjList = mat_list)
+#' tpcaObj <- new("tpcaResult", ObjList = mat_list)
 tpcaResult <- setClass("tpcaResult",
                       slots = list(
                           ObjList = "list",
