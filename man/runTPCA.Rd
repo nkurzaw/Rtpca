@@ -37,8 +37,6 @@ an object of class tpcaResult
 with the following slots:
 1) ObjList: containing the supplied list of
 objects
-
- @export
 }
 \description{
 Run the TPCA analysis

@@ -22,7 +22,7 @@
 #' 1) ObjList: containing the supplied list of
 #' objects
 #' 
-#'  @export
+#' @export
 #'  
 #' @examples  
 #' m1 <- matrix(1:12, ncol = 4)
