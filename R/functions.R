@@ -142,6 +142,16 @@ createDistMat <- function(objList, rownameCol = NULL,
     return(dist_mat)
 }
 
+#' Plot PPI ROC curve
+#' @import ggplot2
+plotPPiRoc <- function(tpcaObj){
+    ggplot(tpcaObj@PPiRocTable, aes(FPR, TPR)) + 
+        geom_line() +
+        geom_line(aes(x, y),
+                  color = "gray",
+                  data = tibble(x = 0:1, y = 0:1),
+                  linetype = "dashed")
+}
 
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                    summaryFUN = median,
