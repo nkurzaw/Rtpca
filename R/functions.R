@@ -143,6 +143,8 @@ createDistMat <- function(objList, rownameCol = NULL,
 }
 
 #' Plot PPI ROC curve
+#' @param tpcaObj tpcaResult object
+#' 
 #' @import ggplot2
 plotPPiRoc <- function(tpcaObj){
     ggplot(tpcaObj@PPiRocTable, aes(FPR, TPR)) + 

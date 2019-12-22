@@ -6,6 +6,9 @@
 \usage{
 plotPPiRoc(tpcaObj)
 }
+\arguments{
+\item{tpcaObj}{tpcaResult object}
+}
 \description{
 Plot PPI ROC curve
 }
