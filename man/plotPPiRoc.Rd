@@ -9,6 +9,21 @@ plotPPiRoc(tpcaObj)
 \arguments{
 \item{tpcaObj}{tpcaResult object}
 }
+\value{
+ggplot object of a receiver operating
+curve (ROC)
+}
 \description{
 Plot PPI ROC curve
+}
+\examples{
+tpcaTest <- new(
+"tpcaResult",
+PPiRocTable = tibble(
+    TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
+    FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
+))
+
+plotPPiRoc(tpcaTest)
+
 }

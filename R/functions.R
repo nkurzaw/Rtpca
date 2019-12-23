@@ -145,7 +145,23 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' Plot PPI ROC curve
 #' @param tpcaObj tpcaResult object
 #' 
+#' @return ggplot object of a receiver operating
+#' curve (ROC)
+#' 
+#' @export
+#' 
 #' @import ggplot2
+#' 
+#' @examples 
+#' tpcaTest <- new(
+#' "tpcaResult",
+#' PPiRocTable = tibble(
+#'     TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
+#'     FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
+#' ))
+#' 
+#' plotPPiRoc(tpcaTest)
+#' 
 plotPPiRoc <- function(tpcaObj){
     ggplot(tpcaObj@PPiRocTable, aes(FPR, TPR)) + 
         geom_line() +
