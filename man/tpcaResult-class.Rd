@@ -25,7 +25,11 @@ S4 TPCA Result Class
 
 \item{\code{ContrastDistMat}}{matrix.}
 
+\item{\code{CommonFeatures}}{vector.}
+
 \item{\code{ComplexAnnotation}}{data.frame.}
+
+\item{\code{ComplexBackgroundDistributionList}}{list.}
 
 \item{\code{PPiAnnotation}}{data.frame.}
 

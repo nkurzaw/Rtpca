@@ -4,7 +4,9 @@
 #' @slot ContrastList list.
 #' @slot DistMat matrix.
 #' @slot ContrastDistMat matrix.
+#' @slot CommonFeatures vector.
 #' @slot ComplexAnnotation data.frame.
+#' @slot ComplexBackgroundDistributionList list.
 #' @slot PPiAnnotation data.frame.
 #' @slot PPiRocTable data.frame.
 #' @slot summaryFUN function.
@@ -34,9 +36,11 @@ tpcaResult <- setClass("tpcaResult",
                       slots = list(
                           ObjList = "list",
                           ContrastList = "list",
+                          CommonFeatures = "vector",
                           DistMat = "matrix",
                           ContrastDistMat = "matrix",
                           ComplexAnnotation = "data.frame",
+                          ComplexBackgroundDistributionList = "list",
                           PPiAnnotation = "data.frame",
                           PPiRocTable = "data.frame",
                           summaryFUN = "function",

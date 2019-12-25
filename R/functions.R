@@ -171,6 +171,32 @@ plotPPiRoc <- function(tpcaObj){
                   linetype = "dashed")
 }
 
+# testForComplexCoAggregation <- function(tpcaObj){
+#     
+# }
+# 
+# .intersectComplexAnnotation <- function(tpcaObj){
+#     cm_df <- tpcaObj@ComplexAnnotation
+#     
+# }
+# 
+# .setBackgroundDistribution <- function(tpcaObj){
+#     
+# }
+
+.sampleBackgroundDistribution <- function(distMat, nMem = 3, nSamp = 10000){
+    nCol <- ncol(distMat)
+    samplesOfN <- sapply(seq_len(nSamp), function(i){
+        ids <- sample(seq_len(nCol), size = nMem, replace = FALSE)
+        mean(distMat[ids, ids][upper.tri(matrix(0, ncol = nMem, nrow = nMem))])
+    })
+    return(samplesOfN)
+}
+
+# plotComplexRoc <- function(tpcaObj){
+#     
+# }
+
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                    summaryFUN = median,
                                    distMethod = "euclidean"){
