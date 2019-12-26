@@ -179,10 +179,22 @@ plotPPiRoc <- function(tpcaObj){
 #     cm_df <- tpcaObj@ComplexAnnotation
 #     
 # }
-# 
-# .setBackgroundDistribution <- function(tpcaObj){
-#     
-# }
+
+.setBackgroundDistribution <- function(tpcaObj, nSamp = 10000){
+    uniqueMembersN <- unique(tpcaObj@ComplexAnnotation$n)
+    tpcaObj@ComplexBackgroundDistributionList <- 
+        .createBackgroundDistList(distMat = tpcaObj@DistMat,
+                                  nMemVec = uniqueMembersN)
+    return(tpcaObj)
+}
+
+.createBackgroundDistList <- function(distMat, nMemVec, nSamp = 10000){
+    backgList <- lapply(nMemVec, function(x) {
+        .sampleBackgroundDistribution(distMat, nMem = x, nSamp = nSamp)
+        })
+    names(backgList) <- nMemVec
+    return(backgList)
+}
 
 .sampleBackgroundDistribution <- function(distMat, nMem = 3, nSamp = 10000){
     nCol <- ncol(distMat)
