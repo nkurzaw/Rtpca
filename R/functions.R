@@ -209,17 +209,25 @@ plotPPiRoc <- function(tpcaObj){
 #     
 # }
 
+#' @import HDF5Array
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                    summaryFUN = median,
                                    distMethod = "euclidean"){
-    tpcaObj@summaryFUN <- summaryFUN
-    tpcaObj@distMethod <- distMethod
-    tpcaObj@DistMat <- createDistMat(
+    distMat <- createDistMat(
         objList = tpcaObj@ObjList, 
         rownameCol = rownameCol, 
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
+    chunkDim <- ifelse(ncol(distMat) < 250, 
+                       ncol(distMat), 250)
+    tpcaObj@summaryFUN <- summaryFUN
+    tpcaObj@distMethod <- distMethod
+    tpcaObj@DistMat <- writeHDF5Array(
+        distMat,
+        chunkdim = c(chunkDim, chunkDim)
+    )
+    dimnames(tpcaObj@DistMat) <- dimnames(distMat)
     return(tpcaObj)
 }
 

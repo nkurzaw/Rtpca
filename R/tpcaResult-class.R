@@ -3,7 +3,7 @@
 #' @slot ObjList list.
 #' @slot ContrastList list.
 #' @slot DistMat matrix.
-#' @slot ContrastDistMat matrix.
+#' @slot ContrastDistMat DelayedMatrix.
 #' @slot CommonFeatures vector.
 #' @slot ComplexAnnotation data.frame.
 #' @slot ComplexBackgroundDistributionList list.
@@ -37,7 +37,7 @@ tpcaResult <- setClass("tpcaResult",
                           ObjList = "list",
                           ContrastList = "list",
                           CommonFeatures = "vector",
-                          DistMat = "matrix",
+                          DistMat = "DelayedMatrix",
                           ContrastDistMat = "matrix",
                           ComplexAnnotation = "data.frame",
                           ComplexBackgroundDistributionList = "list",

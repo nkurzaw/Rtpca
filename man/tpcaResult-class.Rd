@@ -23,7 +23,7 @@ S4 TPCA Result Class
 
 \item{\code{DistMat}}{matrix.}
 
-\item{\code{ContrastDistMat}}{matrix.}
+\item{\code{ContrastDistMat}}{DelayedMatrix.}
 
 \item{\code{CommonFeatures}}{vector.}
 
