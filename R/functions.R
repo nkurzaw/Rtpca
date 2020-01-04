@@ -14,8 +14,6 @@
 #' across replicates, default is median
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
-#' @param stringScore score cutoff to filter
-#' PPIs retrieved from StringDb
 #' 
 #' @return an object of class tpcaResult
 #' with the following slots:
@@ -57,8 +55,7 @@ runTPCA <- function(objList,
                     ppiAnno = NULL,
                     rownameCol = NULL,
                     summaryFUN = median,
-                    distMethod = "euclidean",
-                    stringScore = 700){
+                    distMethod = "euclidean"){
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
         complexAnno = complexAnno,
@@ -72,8 +69,7 @@ runTPCA <- function(objList,
     )
     if(!is.null(ppiAnno)){
         tpcaObj <- .createPPiRocTable(
-            tpcaObj = tpcaObj,
-            stringScore = stringScore
+            tpcaObj = tpcaObj
         )
     }
     return(tpcaObj)
@@ -151,34 +147,65 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' @export
 #' 
 #' @import ggplot2
+#' @importFrom pROC auc
 #' 
 #' @examples 
-#' tpcaTest <- new(
-#' "tpcaResult",
-#' PPiRocTable = tibble(
+#' hdf5M <- writeHDF5Array(x = data.frame(
 #'     TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
 #'     FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
-#' ))
+#' ), chunkdim = c(8, 2))
+#' 
+#' colnames(hdf5M) <- c("TPR", "FPR")
+#' 
+#' tpcaTest <- new(
+#'     "tpcaResult",
+#'     PPiRocTable = hdf5M)
 #' 
 #' plotPPiRoc(tpcaTest)
 #' 
-plotPPiRoc <- function(tpcaObj){
-    ggplot(tpcaObj@PPiRocTable, aes(FPR, TPR)) + 
+plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
+    rocTab <- as.data.frame(
+        tpcaObj@PPiRocTable)
+    if(computeAUC){
+        rocTabAnno <- as.data.frame(
+            tpcaObj@PPiRocTableAnno)
+        aucText <- paste0("AUC = ", as.character(
+            round(suppressMessages(
+                auc(rocTabAnno$annotated ~
+                        rocTab$eucl_dist)[1]), 3)))
+    }
+    p <- ggplot(rocTab, 
+           aes(FPR, TPR)) + 
         geom_line() +
         geom_line(aes(x, y),
                   color = "gray",
                   data = tibble(x = 0:1, y = 0:1),
                   linetype = "dashed")
+    if(computeAUC){
+        p <- p + geom_text(aes(x, y, label = label), 
+                           data = tibble(x = 0.75, y = 0.1,
+                                         label = aucText))
+    }
+    return(p)
+        
 }
 
 # testForComplexCoAggregation <- function(tpcaObj){
 #     
 # }
 # 
-# .intersectComplexAnnotation <- function(tpcaObj){
-#     cm_df <- tpcaObj@ComplexAnnotation
-#     
-# }
+.intersectComplexAnnotation <- function(tpcaObj, minCount = 3){
+    caDf <- tpcaObj@ComplexAnnotation
+    caDfFil <- filter(
+        caDf, protein %in% 
+            tpcaObj@CommonFeatures) %>% 
+        group_by(id) %>% 
+        mutate(count = n()) %>% 
+        ungroup %>% 
+        filter(count >= minCount)
+    tpcaObj@ComplexAnnotation <- caDfFil
+    return(tpcaObj)
+}
 
 .setBackgroundDistribution <- function(tpcaObj, nSamp = 10000){
     uniqueMembersN <- unique(tpcaObj@ComplexAnnotation$n)
@@ -213,6 +240,10 @@ plotPPiRoc <- function(tpcaObj){
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                    summaryFUN = median,
                                    distMethod = "euclidean"){
+    tpcaObj@CommonFeatures <- .getCommonRownames(
+        objList = tpcaObj@ObjList,
+        rownameCol = rownameCol
+    )
     distMat <- createDistMat(
         objList = tpcaObj@ObjList, 
         rownameCol = rownameCol, 
@@ -259,11 +290,12 @@ plotPPiRoc <- function(tpcaObj){
 
 #' @import dplyr
 #' @import tidyr
-.createPPiRocTable <- function(tpcaObj, stringScore = 700){
-    colname <- value <- rowname <- pair <- combined_score <- 
+#' @import HDF5Array
+.createPPiRocTable <- function(tpcaObj){
+    colname <- value <- rowname <- pair <- 
         annotated <- NULL
     
-    dist_df <- tpcaObj@DistMat %>% 
+    distDf <- tpcaObj@DistMat %>% 
         tbl_df %>% 
         mutate(rowname = rownames(tpcaObj@DistMat)) %>% 
         gather(colname, value, -rowname) %>% 
@@ -275,15 +307,28 @@ plotPPiRoc <- function(tpcaObj){
                !duplicated(pair)) %>% 
         arrange(value) %>% 
         mutate(annotated = pair %in% 
-                   filter(tpcaObj@PPiAnnotation, 
-                          combined_score >= stringScore)$pair) %>% 
+                   tpcaObj@PPiAnnotation$pair) %>% 
         mutate(TPR = cumsum(as.numeric(annotated)) / 
                     sum(as.numeric(annotated)), 
                FPR = cumsum(as.numeric(annotated == FALSE)) / 
                    (n() - cumsum(as.numeric(value != 0)) +  
                         cumsum(as.numeric(annotated == FALSE))))
-    
-    tpcaObj@PPiRocTable <- dist_df
+    chunDimsMat <- c(ifelse(nrow(distDf) < 500,
+                            nrow(distDf), 500), 3)
+    chunDimsAnno <- c(ifelse(nrow(distDf) < 500, 
+                             nrow(distDf), 500), 2)
+    rocMat <- as.matrix(
+        distDf %>% dplyr::select(TPR, FPR, value))
+    tpcaObj@PPiRocTable <- writeHDF5Array(
+        x = rocMat, chunkdim = chunDimsMat)
+    colnames(tpcaObj@PPiRocTable) <- 
+        c("TPR", "FPR", "eucl_dist")
+    annoDf <- as.data.frame(
+        dplyr::select(distDf, pair, annotated))
+    tpcaObj@PPiRocTableAnno <- writeHDF5Array(
+        x = annoDf, chunkdim = chunDimsAnno)
+    colnames(tpcaObj@PPiRocTableAnno) <- 
+        c("pair", "annotated")
     return(tpcaObj)
 }
 

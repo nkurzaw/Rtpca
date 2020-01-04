@@ -5,8 +5,7 @@
 \title{Run the TPCA analysis}
 \usage{
 runTPCA(objList, complexAnno = NULL, ppiAnno = NULL,
-  rownameCol = NULL, summaryFUN = median, distMethod = "euclidean",
-  stringScore = 700)
+  rownameCol = NULL, summaryFUN = median, distMethod = "euclidean")
 }
 \arguments{
 \item{objList}{inout list of objects, e.g.
@@ -28,9 +27,6 @@ across replicates, default is median}
 
 \item{distMethod}{method to use within dist function,
 default is 'euclidean'}
-
-\item{stringScore}{score cutoff to filter
-PPIs retrieved from StringDb}
 }
 \value{
 an object of class tpcaResult

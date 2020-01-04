@@ -33,7 +33,9 @@ S4 TPCA Result Class
 
 \item{\code{PPiAnnotation}}{data.frame.}
 
-\item{\code{PPiRocTable}}{data.frame.}
+\item{\code{PPiRocTable}}{DelayedMatrix.}
+
+\item{\code{PPiRocTableAnno}}{DelayedMatrix.}
 
 \item{\code{summaryFUN}}{function.}
 
