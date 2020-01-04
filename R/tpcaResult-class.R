@@ -8,7 +8,8 @@
 #' @slot ComplexAnnotation data.frame.
 #' @slot ComplexBackgroundDistributionList list.
 #' @slot PPiAnnotation data.frame.
-#' @slot PPiRocTable data.frame.
+#' @slot PPiRocTable DelayedMatrix.
+#' @slot PPiRocTableAnno DelayedMatrix.
 #' @slot summaryFUN function.
 #' @slot distMethod character.
 #'
@@ -42,6 +43,7 @@ tpcaResult <- setClass("tpcaResult",
                           ComplexAnnotation = "data.frame",
                           ComplexBackgroundDistributionList = "list",
                           PPiAnnotation = "data.frame",
-                          PPiRocTable = "data.frame",
+                          PPiRocTable = "DelayedMatrix",
+                          PPiRocTableAnno = "DelayedMatrix",
                           summaryFUN = "function",
                           distMethod = "character"))
