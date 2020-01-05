@@ -8,6 +8,11 @@ plotPPiRoc(tpcaObj, computeAUC = FALSE)
 }
 \arguments{
 \item{tpcaObj}{tpcaResult object}
+
+\item{computeAUC}{logical parameter indicating
+whether areau under the ROC should be computed
+and indicated in the lower right corner of the 
+plot}
 }
 \value{
 ggplot object of a receiver operating
