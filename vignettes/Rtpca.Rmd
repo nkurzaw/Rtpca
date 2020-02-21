@@ -48,22 +48,7 @@ ecoliTPCA <- runTPCA(
 plotPPiRoc(ecoliTPCA, computeAUC = TRUE)
 ```
 
-## PPis within complexes
-
 ```{r}
-ecoliTrData <- tpptrImport(configTable = ecoli_stat_vs_exp_config, 
-                           data = ecoli_stat_vs_exp_cytosol_data,
-                           idVar = "gene_name")
+sessionInfo()
 ```
 
-```{r}
-load("/Users/kurzawa/repos/Rtpca/data/ecoli_complex_ppis.rda")
-ecoliTPCA <- runTPCA(
-    objList = ecoliTrData[1:3], #ecoliDataNorm$normData[1:3],
-    ppiAnno = ecoli_complex_ppis
-)
-```
-
-```{r}
-plotPPiRoc(ecoliTPCA, computeAUC = TRUE)
-```
