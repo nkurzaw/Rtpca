@@ -13,7 +13,7 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: false
 biocViews: Software, Proteomics, DataImport
-Depends: R (>= 3.6.0), stats, utils, Biobase, dplyr, tidyr, HDF5Array
+Depends: R (>= 3.6.0), stats, utils, Biobase, dplyr, tidyr
 Imports: methods, ggplot2, pROC
 Suggests: knitr, BiocStyle, testthat, TPP
 RoxygenNote: 6.1.1

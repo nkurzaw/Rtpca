@@ -23,7 +23,7 @@ S4 TPCA Result Class
 
 \item{\code{DistMat}}{matrix.}
 
-\item{\code{ContrastDistMat}}{DelayedMatrix.}
+\item{\code{ContrastDistMat}}{matrix}
 
 \item{\code{CommonFeatures}}{vector.}
 
@@ -33,9 +33,9 @@ S4 TPCA Result Class
 
 \item{\code{PPiAnnotation}}{data.frame.}
 
-\item{\code{PPiRocTable}}{DelayedMatrix.}
+\item{\code{PPiRocTable}}{data.frame}
 
-\item{\code{PPiRocTableAnno}}{DelayedMatrix.}
+\item{\code{PPiRocTableAnno}}{data.frame}
 
 \item{\code{summaryFUN}}{function.}
 

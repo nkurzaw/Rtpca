@@ -3,13 +3,13 @@
 #' @slot ObjList list.
 #' @slot ContrastList list.
 #' @slot DistMat matrix.
-#' @slot ContrastDistMat DelayedMatrix.
+#' @slot ContrastDistMat matrix
 #' @slot CommonFeatures vector.
 #' @slot ComplexAnnotation data.frame.
 #' @slot ComplexBackgroundDistributionList list.
 #' @slot PPiAnnotation data.frame.
-#' @slot PPiRocTable DelayedMatrix.
-#' @slot PPiRocTableAnno DelayedMatrix.
+#' @slot PPiRocTable data.frame
+#' @slot PPiRocTableAnno data.frame
 #' @slot summaryFUN function.
 #' @slot distMethod character.
 #'
@@ -38,12 +38,36 @@ tpcaResult <- setClass("tpcaResult",
                           ObjList = "list",
                           ContrastList = "list",
                           CommonFeatures = "vector",
-                          DistMat = "DelayedMatrix",
+                          DistMat = "matrix", #"DelayedMatrix",
                           ContrastDistMat = "matrix",
                           ComplexAnnotation = "data.frame",
                           ComplexBackgroundDistributionList = "list",
                           PPiAnnotation = "data.frame",
-                          PPiRocTable = "DelayedMatrix",
-                          PPiRocTableAnno = "DelayedMatrix",
+                          PPiRocTable = "data.frame", #"DelayedMatrix",
+                          PPiRocTableAnno = "data.frame", #"DelayedMatrix",
                           summaryFUN = "function",
                           distMethod = "character"))
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Show
+###
+
+setMethod("show", "tpcaResult",
+          function(object)
+          {
+              cat("class:", class(object), "\n")
+              
+              cat('Slot "ObjList":', names(object@ObjList), 
+                  "of class", class(object@ObjList), "\n")
+              
+              cat('Slot "ContrastList":', names(object@ContrastList), 
+                  "of class", class(object@ContrastList), "\n")
+              
+              cat('Slot "DistMat" with dimension:', dim(object@DistMat), "\n") 
+              
+              cat('Slot "ContrastDistMat" with dimension:', dim(object@ContrastDistMat), "\n") 
+              
+              cat('Slot "ComplexAnnotation" of class:', class(object@ComplexAnnotation), 
+                  'with dim:', dim(object@ComplexAnnotation), "\n")
+          })

@@ -154,25 +154,21 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' @importFrom pROC auc
 #' 
 #' @examples 
-#' hdf5M <- writeHDF5Array(x = data.frame(
+#' rocTab = data.frame(
 #'     TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
 #'     FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
-#' ), chunkdim = c(8, 2))
-#' 
-#' colnames(hdf5M) <- c("TPR", "FPR")
+#' )
 #' 
 #' tpcaTest <- new(
 #'     "tpcaResult",
-#'     PPiRocTable = hdf5M)
+#'     PPiRocTable = rocTab)
 #' 
 #' plotPPiRoc(tpcaTest)
 #' 
 plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
-    rocTab <- as.data.frame(
-        tpcaObj@PPiRocTable)
+    rocTab <- tpcaObj@PPiRocTable
     if(computeAUC){
-        rocTabAnno <- as.data.frame(
-            tpcaObj@PPiRocTableAnno)
+        rocTabAnno <- tpcaObj@PPiRocTableAnno
         aucText <- paste0("AUC = ", as.character(
             round(suppressMessages(
                 auc(rocTabAnno$annotated ~
@@ -180,7 +176,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     }
     p <- ggplot(rocTab, 
            aes(FPR, TPR)) + 
-        geom_line() +
+        geom_path() +
         geom_line(aes(x, y),
                   color = "gray",
                   data = tibble(x = 0:1, y = 0:1),
@@ -240,7 +236,6 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 #     
 # }
 
-#' @import HDF5Array
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                    summaryFUN = median,
                                    distMethod = "euclidean"){
@@ -258,10 +253,11 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
                        ncol(distMat), 250)
     tpcaObj@summaryFUN <- summaryFUN
     tpcaObj@distMethod <- distMethod
-    tpcaObj@DistMat <- writeHDF5Array(
-        distMat,
-        chunkdim = c(chunkDim, chunkDim)
-    )
+    tpcaObj@DistMat <- distMat 
+    # writeHDF5Array(
+    #     distMat,
+    #     chunkdim = c(chunkDim, chunkDim)
+    # )
     dimnames(tpcaObj@DistMat) <- dimnames(distMat)
     return(tpcaObj)
 }
@@ -294,7 +290,6 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 
 #' @import dplyr
 #' @import tidyr
-#' @import HDF5Array
 .createPPiRocTable <- function(tpcaObj){
     colname <- value <- rowname <- pair <- 
         annotated <- NULL
@@ -317,22 +312,26 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
                FPR = cumsum(as.numeric(annotated == FALSE)) / 
                    (n() - cumsum(as.numeric(value != 0)) +  
                         cumsum(as.numeric(annotated == FALSE))))
-    chunDimsMat <- c(ifelse(nrow(distDf) < 500,
-                            nrow(distDf), 500), 3)
-    chunDimsAnno <- c(ifelse(nrow(distDf) < 500, 
-                             nrow(distDf), 500), 2)
-    rocMat <- as.matrix(
-        distDf %>% dplyr::select(TPR, FPR, value))
-    tpcaObj@PPiRocTable <- writeHDF5Array(
-        x = rocMat, chunkdim = chunDimsMat)
-    colnames(tpcaObj@PPiRocTable) <- 
-        c("TPR", "FPR", "eucl_dist")
-    annoDf <- as.data.frame(
-        dplyr::select(distDf, pair, annotated))
-    tpcaObj@PPiRocTableAnno <- writeHDF5Array(
-        x = annoDf, chunkdim = chunDimsAnno)
-    colnames(tpcaObj@PPiRocTableAnno) <- 
-        c("pair", "annotated")
+    # chunDimsMat <- c(ifelse(nrow(distDf) < 500,
+    #                         nrow(distDf), 500), 3)
+    # chunDimsAnno <- c(ifelse(nrow(distDf) < 500, 
+    #                          nrow(distDf), 500), 2)
+    # rocMat <- as.matrix(
+    #     distDf %>% dplyr::select(TPR, FPR, value))
+    # tpcaObj@PPiRocTable <- writeHDF5Array(
+    #     x = rocMat, chunkdim = chunDimsMat)
+    tpcaObj@PPiRocTable <- distDf %>% 
+        dplyr::select(TPR, FPR, eucl_dist = value)
+    # colnames(tpcaObj@PPiRocTable) <- 
+    #     c("TPR", "FPR", "eucl_dist")
+    # annoDf <- as.data.frame(
+    #     dplyr::select(distDf, pair, annotated))
+    # tpcaObj@PPiRocTableAnno <- writeHDF5Array(
+    #     x = annoDf, chunkdim = chunDimsAnno)
+    tpcaObj@PPiRocTableAnno <- distDf %>% 
+        dplyr::select(pair, annotated)
+    # colnames(tpcaObj@PPiRocTableAnno) <- 
+    #     c("pair", "annotated")
     return(tpcaObj)
 }
 
@@ -402,4 +401,44 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     rownames(sumMat) <- rownames(matList[[1]])
     colnames(sumMat) <- colnames(matList[[1]])
     return(sumMat)
+}
+
+.filterDistMat <- function(dist_mat, ppi_anno){
+    dist_mat[rownames(dist_mat) %in% ppi_anno$x,
+             colnames(dist_mat) %in% ppi_anno$y]
+}
+
+#' @import dplyr
+#' @import tidyr
+.distMat2AnnotatedPPiDf <- function(dist_mat, ppi_anno){
+    dist_mat %>% 
+        tbl_df %>% 
+        mutate(rowname = rownames(dist_mat)) %>% 
+        gather(key, value, -rowname) %>% 
+        rowwise %>% 
+        mutate(pair = paste(sort(c(rowname, key)), 
+                            collapse = ":")) %>% 
+        ungroup %>% 
+        filter(rowname != key, !duplicated(pair), 
+               pair %in% ppi_anno$pair)
+}
+
+#' @import dplyr
+.combineCondDistMatsFstat <- function(dist_df_c1, 
+                                      dist_df_c2){
+    combo_df <- left_join(
+        dist_df_c1 %>% 
+            dplyr::select(pair, valueC1 = value), 
+        dist_df_c2 %>% 
+            dplyr::select(pair, valueC2 = value), 
+        by = "pair") %>% 
+        mutate(rssC1 = sqrt(valueC1),
+               rssC2 = sqrt(valueC2)) %>% 
+        mutate(rssC1_rssC2 = rssC1 - rssC2) %>% 
+        rowwise() %>% 
+        mutate(min_rssC1_rssC2 = min(c(rssC1, rssC2))) %>% 
+        ungroup %>% 
+        mutate(f_stat = abs(rssC1_rssC2)/min_rssC1_rssC2)
+    
+    return(combo_df)
 }

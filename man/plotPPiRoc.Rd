@@ -22,16 +22,14 @@ curve (ROC)
 Plot PPI ROC curve
 }
 \examples{
-hdf5M <- writeHDF5Array(x = data.frame(
+rocTab = data.frame(
     TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
     FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
-), chunkdim = c(8, 2))
-
-colnames(hdf5M) <- c("TPR", "FPR")
+)
 
 tpcaTest <- new(
     "tpcaResult",
-    PPiRocTable = hdf5M)
+    PPiRocTable = rocTab)
 
 plotPPiRoc(tpcaTest)
 

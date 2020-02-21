@@ -36,7 +36,8 @@ tpcaTest1 <- new(
 tpcaTest2 <- Rtpca:::.createDistMatTpcaObj(
     tpcaObj = tpcaTest1)
 
-M2 <- writeHDF5Array(matrix(c(0, 2, 0, 2), ncol = 2))
+#M2 <- writeHDF5Array(matrix(c(0, 2, 0, 2), ncol = 2))
+M2 <- matrix(c(0, 2, 2, 0), byrow = TRUE, ncol = 2)
 
 expect_equivalent(
     tpcaTest2@DistMat,
