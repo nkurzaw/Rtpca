@@ -387,7 +387,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .checkMatDims <- function(matList){
-    if(length(Reduce(intersect, lapply(matList, dim))) != 2){
+    dim_list <- lapply(matList, dim)
+    if(!all(sapply(dim_list, identical, dim_list[[1]]))){
         stop("checkMatDims: unequal matrix dimensions!")
     }
 }
