@@ -237,33 +237,59 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 # }
 
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
-                                   summaryFUN = median,
-                                   distMethod = "euclidean"){
-    tpcaObj@CommonFeatures <- .getCommonRownames(
-        objList = tpcaObj@ObjList,
-        rownameCol = rownameCol
-    )
+                                  summaryFUN = median,
+                                  distMethod = "euclidean",
+                                  cond = "c1"){
+
+    if(length(tpcaObj@ContrastList) == 0){
+        tpcaObj@CommonFeatures <- .getCommonRownames(
+            objList = tpcaObj@ObjList,
+            rownameCol = rownameCol
+        )  
+    }else{
+        tpcaObj@CommonFeatures <- .getCommonRownames(
+            objList = c(tpcaObj@ObjList, tpcaObj@ContrastList),
+            rownameCol = rownameCol
+        )  
+    }
+    
     distMat <- createDistMat(
         objList = tpcaObj@ObjList, 
         rownameCol = rownameCol, 
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
-    chunkDim <- ifelse(ncol(distMat) < 250, 
-                       ncol(distMat), 250)
+    if(length(tpcaObj@ContrastList) != 0){
+        contrastDistMat <- createDistMat(
+            objList = tpcaObj@ContrastList, 
+            rownameCol = rownameCol, 
+            summaryFUN = summaryFUN,
+            distMethod = distMethod
+        )
+    }
+    # chunkDim <- ifelse(ncol(distMat) < 250, 
+    #                    ncol(distMat), 250)
     tpcaObj@summaryFUN <- summaryFUN
     tpcaObj@distMethod <- distMethod
     tpcaObj@DistMat <- distMat 
+    dimnames(tpcaObj@DistMat) <- dimnames(distMat)
+    if(length(tpcaObj@ContrastList) != 0){
+        tpcaObj@ContrastDistMat <- contrastDistMat
+        dimnames(tpcaObj@ContrastDistMat) <- dimnames(contrastDistMat)
+    }
+    
     # writeHDF5Array(
     #     distMat,
     #     chunkdim = c(chunkDim, chunkDim)
     # )
-    dimnames(tpcaObj@DistMat) <- dimnames(distMat)
+    
     return(tpcaObj)
 }
 
 #' @importFrom methods new
-.checkAnnoArguments <- function(objList, complexAnno = NULL,
+.checkAnnoArguments <- function(objList, 
+                                contrastList = list(),
+                                complexAnno = NULL,
                                 ppiAnno = NULL){
     if(is.null(complexAnno) & is.null(ppiAnno)){
         stop(paste(c("Neither complex annotation nor a PPI", 
@@ -278,11 +304,13 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     }else if(!is.null(complexAnno)){
         tpcaObj <- new("tpcaResult",
                        ObjList = objList,
+                       ContrastList = contrastList,
                        ComplexAnnotation = complexAnno)
         return(tpcaObj)
     }else if(!is.null(ppiAnno)){
         tpcaObj <- new("tpcaResult",
                        ObjList = objList,
+                       ContrastList = contrastList,
                        PPiAnnotation = ppiAnno)
         return(tpcaObj)
     }
@@ -442,4 +470,121 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
         mutate(f_stat = abs(rssC1_rssC2)/min_rssC1_rssC2)
     
     return(combo_df)
+}
+
+.getRandomProteinPairs <- function(common_rownames, n = 10000){
+    random_prots <- 
+        head(tibble(
+            x = sample(common_rownames, n + 100, replace = TRUE),
+            y = sample(common_rownames, n + 100, replace = TRUE)
+        ) %>% 
+            filter(x!=y), n = n) %>% 
+        rowwise() %>% 
+        mutate(pair = paste(sort(c(x, y)), collapse = ":")) %>% 
+        ungroup 
+    
+    return(random_prots)
+}
+
+.compareConditions <- function(tpcaObj, prot_pairs){
+    distMatC1 <- .filterDistMat(
+        tpcaObj@DistMat,
+        prot_pairs)
+    
+    distMatDfC1 <- .distMat2AnnotatedPPiDf(
+        dist_mat = distMatC1,
+        ppi_anno = prot_pairs
+    )
+    
+    distMatC2 <- .filterDistMat(
+        tpcaObj@ContrastDistMat,
+        prot_pairs)
+    
+    distMatDfC2 <- .distMat2AnnotatedPPiDf(
+        dist_mat = distMatC2,
+        ppi_anno = prot_pairs
+    )
+    
+    comboDf <- .combineCondDistMatsFstat(
+        distMatDfC1,
+        distMatDfC2
+    )
+    return(comboDf)
+}
+
+.compareConditionsRandom <- function(tpcaObj, n = 10000){
+    commonRownames <- .getCommonRownames(
+        c(tpcaObj@ObjList, tpcaObj@ContrastList)
+    )
+    
+    random_prot_pairs <- .getRandomProteinPairs(
+        common_rownames = commonRownames,
+        n = n
+    )
+    
+    comboRandDf <- .compareConditions(
+        tpcaObj,
+        prot_pairs = random_prot_pairs)
+    
+    return(comboRandDf)
+}
+
+.computeEmpiricalPValue <- function(
+    combo_df, combo_rand_df, p_adj_method = "BH"){
+    
+    empirical_p_df <- combo_df %>% 
+        na.omit() %>% 
+        rowwise() %>% 
+        mutate(p_value = length(which(combo_rand_df$f_stat >= f_stat))/
+                   nrow(combo_rand_df)) %>% 
+        ungroup %>% 
+        mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+    
+    return(empirical_p_df)
+}
+
+runDiffTPCA <- function(objList, 
+                        contrastList,
+                        ppiAnno = NULL,
+                        rownameCol = NULL,
+                        summaryFUN = median,
+                        distMethod = "euclidean",
+                        n = 10000,
+                        p_adj_method = "BH"){
+    tpcaObj <- .checkAnnoArguments(
+        objList = objList,
+        contrastList = contrastList,
+        complexAnno = NULL,
+        ppiAnno = ppiAnno
+    )
+    tpcaObj <- .createDistMatTpcaObj(
+        tpcaObj = tpcaObj, 
+        rownameCol = rownameCol, 
+        summaryFUN = summaryFUN,
+        distMethod = distMethod
+    )
+    combo_df <- .compareConditions(
+        tpcaObj = tpcaObj, 
+        prot_pairs = ppiAnno
+    )
+    
+    combo_rand_df <- .compareConditionsRandom(
+        tpcaObj = tpcaObj, 
+        n = n
+    )
+    
+    tpcaObj@diffTpcaResultTable <- .computeEmpiricalPValue(
+        combo_df, 
+        combo_rand_df, 
+        p_adj_method = p_adj_method)
+    return(tpcaObj)
+}
+
+plotDiffTpcaVolcano <- function(tpcaObj){
+    plot_df <- tpcaObj@diffTpcaResultTable
+    
+    p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
+        geom_point(color = "gray", alpha = 0.25) + 
+        geom_point(color = "steelblue", data = filter(plot_df, p_adj < 0.1)) + 
+        theme_bw()
 }
