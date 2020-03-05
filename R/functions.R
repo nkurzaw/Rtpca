@@ -585,6 +585,8 @@ plotDiffTpcaVolcano <- function(tpcaObj){
     
     p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.25) + 
-        geom_point(color = "steelblue", data = filter(plot_df, p_adj < 0.1)) + 
-        theme_bw()
+        geom_point(data = filter(plot_df, p_adj < 0.1)) + 
+        theme_bw() +
+        labs(x = expression('RSS'^c1* ' - RSS'^c2*''),
+             y = expression('-log'[10]*'('*italic(p)*' value)'))
 }
