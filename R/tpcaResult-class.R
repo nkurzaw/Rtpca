@@ -78,4 +78,23 @@ setMethod("show", "tpcaResult",
               
               cat('Slot "ComplexAnnotation" of class:', class(object@ComplexAnnotation), 
                   'with dim:', dim(object@ComplexAnnotation), "\n")
+              
+              cat('Slot "ComplexBackgroundDistributionList" of class:', class(object@ComplexBackgroundDistributionList), 
+                  'with length:', length(object@ComplexBackgroundDistributionList), "\n")
+              
+              cat('Slot "PPiAnnotation" of class:', class(object@PPiAnnotation), 
+                  'with dim:', dim(object@PPiAnnotation), "\n")
+              
+              cat('Slot "PPiRocTable" of class:', class(object@PPiRocTable), 
+                  'with dim:', dim(object@PPiRocTable), "\n")
+              
+              cat('Slot "PPiRocTableAnno" of class:', class(object@PPiRocTableAnno), 
+                  'with dim:', dim(object@PPiRocTableAnno), "\n")
+              
+              cat('Slot "summaryFUN":', object@summaryFUN, "\n")
+              
+              cat('Slot "distMethod":', object@distMethod, "\n")
+              
+              cat('Slot "diffTpcaResultTable" of class:', class(object@diffTpcaResultTable), 
+                  'with dim:', dim(object@diffTpcaResultTable), "\n")
           })
