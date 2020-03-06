@@ -91,8 +91,8 @@ setMethod("show", "tpcaResult",
               cat('Slot "PPiRocTableAnno" of class:', class(object@PPiRocTableAnno), 
                   'with dim:', dim(object@PPiRocTableAnno), "\n")
               
-              cat('Slot "summaryFUN":', ifelse(!is.null(try(tpcaObj@summaryFUN(), silent = TRUE)), 
-                                               tpcaObj@summaryFUN@generic[1], "NULL"), "\n")
+              cat('Slot "summaryFUN":', ifelse(!is.null(try(object@summaryFUN(), silent = TRUE)), 
+                                               object@summaryFUN@generic[1], "NULL"), "\n")
               
               cat('Slot "distMethod":', ifelse(!is.na(object@distMethod), 
                                                object@distMethod, "NA") , "\n")
