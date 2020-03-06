@@ -580,7 +580,10 @@ runDiffTPCA <- function(objList,
     return(tpcaObj)
 }
 
-plotDiffTpcaVolcano <- function(tpcaObj){
+#' @import ggplot2
+plotDiffTpcaVolcano <- function(tpcaObj, 
+                                setXLim  = FALSE, 
+                                xlimit = c(-0.75, 0.75)){
     plot_df <- tpcaObj@diffTpcaResultTable
     
     p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
@@ -589,4 +592,10 @@ plotDiffTpcaVolcano <- function(tpcaObj){
         theme_bw() +
         labs(x = expression('RSS'^c1* ' - RSS'^c2*''),
              y = expression('-log'[10]*'('*italic(p)*' value)'))
+    
+    if(setXLim){
+        p <- p + coord_cartesian(xlim = xlimit)
+    }
+    
+    return(p)
 }
