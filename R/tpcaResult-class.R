@@ -92,10 +92,10 @@ setMethod("show", "tpcaResult",
                   'with dim:', dim(object@PPiRocTableAnno), "\n")
               
               cat('Slot "summaryFUN":', ifelse(!is.null(try(object@summaryFUN(), silent = TRUE)), 
-                                               object@summaryFUN@generic[1], "NULL"), "\n")
+                                               deparse(object@summaryFUN)[2], "not specified"), "\n")
               
               cat('Slot "distMethod":', ifelse(!is.na(object@distMethod), 
-                                               object@distMethod, "NA") , "\n")
+                                               object@distMethod, "not specified") , "\n")
               
               cat('Slot "diffTpcaResultTable" of class:', class(object@diffTpcaResultTable), 
                   'with dim:', dim(object@diffTpcaResultTable), "\n")
