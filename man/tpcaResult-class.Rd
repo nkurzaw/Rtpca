@@ -40,6 +40,8 @@ S4 TPCA Result Class
 \item{\code{summaryFUN}}{function.}
 
 \item{\code{distMethod}}{character.}
+
+\item{\code{diffTpcaResultTable}}{data.frame.}
 }}
 
 \examples{
