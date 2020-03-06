@@ -433,8 +433,16 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .filterDistMat <- function(dist_mat, ppi_anno){
-    dist_mat[rownames(dist_mat) %in% ppi_anno$x,
-             colnames(dist_mat) %in% ppi_anno$y]
+    mat_nrow <- length(which(rownames(dist_mat) %in% ppi_anno$x))
+    filt_mat <- dist_mat[rownames(dist_mat) %in% ppi_anno$x,
+                         colnames(dist_mat) %in% ppi_anno$y]
+    filt_matrix <- matrix(filt_mat, nrow = mat_nrow)
+    rownames(filt_matrix) <- rownames(dist_mat)[
+        rownames(dist_mat) %in% ppi_anno$x]
+    colnames(filt_matrix) <- colnames(dist_mat)[
+        colnames(dist_mat) %in% ppi_anno$y]
+    
+    return(filt_matrix)
 }
 
 #' @import dplyr

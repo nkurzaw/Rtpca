@@ -27,7 +27,10 @@ ppi_anno <- tibble(
     combined_score = 700,
     pair = "3:4")
 
+ref_mat <- matrix(2)
+dimnames(ref_mat) <- list("3", "4")
+
 expect_identical(
     Rtpca:::.filterDistMat(dist_mat, ppi_anno = ppi_anno),
-    2
+    ref_mat
 )
