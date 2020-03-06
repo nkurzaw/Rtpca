@@ -39,7 +39,8 @@ ref_df <- tibble(
     valueC2 = c(4, 8)
 )
 
-diff_tpca <- Rtpca:::runDiffTPCA(mat_list, contrast_list, ppiAnno = ppi_anno)
+diff_tpca <- runDiffTPCA(mat_list, contrast_list, 
+                         ppiAnno = ppi_anno)
 
 expect_identical(
     diff_tpca@diffTpcaResultTable[,c(1,3)],
