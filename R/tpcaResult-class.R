@@ -12,6 +12,7 @@
 #' @slot PPiRocTableAnno data.frame
 #' @slot summaryFUN function.
 #' @slot distMethod character.
+#' @slot tpcaResultTable data.frame.
 #' @slot diffTpcaResultTable data.frame.
 #'
 #' @return an object of class tpcaResult
@@ -48,6 +49,7 @@ tpcaResult <- setClass("tpcaResult",
                           PPiRocTableAnno = "data.frame", #"DelayedMatrix",
                           summaryFUN = "function",
                           distMethod = "character",
+                          tpcaResultTable = "data.frame",
                           diffTpcaResultTable = "data.frame"))
 
 
@@ -61,10 +63,12 @@ setMethod("show", "tpcaResult",
               cat("class:", class(object), "\n")
               
               cat('Slot "ObjList":', names(object@ObjList), 
-                  "of class", class(object@ObjList), "\n")
+                  "of class", class(object@ObjList), 
+                  "and length", length(object@ObjList), "\n")
               
               cat('Slot "ContrastList":', names(object@ContrastList), 
-                  "of class", class(object@ContrastList), "\n")
+                  "of class", class(object@ContrastList),
+                  "and length", length(object@ContrastList),"\n")
               
               cat('Slot "DistMat" with dimension:', dim(object@DistMat), "\n") 
               # cat('head(DistMat):', "\n")
