@@ -41,6 +41,8 @@ S4 TPCA Result Class
 
 \item{\code{distMethod}}{character.}
 
+\item{\code{tpcaResultTable}}{data.frame.}
+
 \item{\code{diffTpcaResultTable}}{data.frame.}
 }}
 

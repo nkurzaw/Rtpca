@@ -18,7 +18,7 @@ determing the x-axis limits, only is implemented
 if setXLim is set to TRUE}
 }
 \value{
-
+ggplot displaying a volcano plot
 }
 \description{
 Plot differential TPCA analysis results
