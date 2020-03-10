@@ -1,6 +1,5 @@
 ## Tests for plotPPiRoc
 ## library(Rtpca); library(testthat)
-#library(HDF5Array)
 context("plotPPiRoc")
 
 #hdf5M <- writeHDF5Array(x = 

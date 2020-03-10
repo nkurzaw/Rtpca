@@ -860,7 +860,7 @@ runDiffTPCA <- function(objList,
 #'     valueC2 = c(4, 8)
 #' )
 #' 
-#' diff_tpca <- Rtpca:::runDiffTPCA(
+#' diff_tpca <- runDiffTPCA(
 #'   mat_list, contrast_list, ppiAnno = ppi_anno)
 #' 
 #' plotDiffTpcaVolcano(diff_tpca)
