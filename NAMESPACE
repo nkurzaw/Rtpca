@@ -3,6 +3,7 @@
 export(createDistMat)
 export(plotDiffTpcaVolcano)
 export(plotPPiRoc)
+export(plotTpcaVolcano)
 export(runDiffTPCA)
 export(runTPCA)
 exportClasses(tpcaResult)

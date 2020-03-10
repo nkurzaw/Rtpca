@@ -14,6 +14,21 @@
 #' across replicates, default is median
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
+#' @param doRocAnalysis logical indicating whether a ROC 
+#' analysis should be performed which can be used to assess 
+#' the predictive power of the dataset for protein-protein
+#' interactions / protein complexes based on distanc between
+#' melting curves of protein interactions partners
+#' @param minCount integer indicating how many subunits 
+#' of a complex should be qunatified to inlucde it into the
+#' analysis, default is 3
+#' @param nSamp integer indicating the number of random samples
+#' which should be performed to estimate empirical null 
+#' distributions, default is 10000
+#' @param p_adj_method character string indicating a valid 
+#' method to be used for multiple testing adjusment, default 
+#' is "BH" which makes p.adjust use benjamini-hochberg, for 
+#' additional options check ?p.adjust
 #' 
 #' @return an object of class tpcaResult
 #' with the following slots:
@@ -55,23 +70,46 @@ runTPCA <- function(objList,
                     ppiAnno = NULL,
                     rownameCol = NULL,
                     summaryFUN = median,
-                    distMethod = "euclidean"){
+                    distMethod = "euclidean",
+                    doRocAnalysis = TRUE,
+                    minCount = 3,
+                    nSamp = 10000,
+                    p_adj_method = "BH"
+                    ){
+    message("Checking function arguments. \n")
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
         complexAnno = complexAnno,
         ppiAnno = ppiAnno
     )
+    message("\nCreating distance matrices. \n")
     tpcaObj <- .createDistMatTpcaObj(
         tpcaObj = tpcaObj, 
         rownameCol = rownameCol, 
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
-    if(!is.null(ppiAnno)){
+    if(!is.null(ppiAnno) & doRocAnalysis){
+        message("\nPerformning ROC analysis. \n")
         tpcaObj <- .createPPiRocTable(
             tpcaObj = tpcaObj
         )
     }
+    # else if(!is.null(complexAnno) & doRocAnalysis){
+    #     tpcaObj <- .createPPiRocTable(
+    #         tpcaObj = tpcaObj
+    #     )
+    # }
+    if(!is.null(complexAnno)){
+        message("\nTesting for complex co-aggregation. \n")
+        tpcaObj <- .testForComplexCoAggregation(
+            tpcaObj = tpcaObj, 
+            minCount = minCount, 
+            nSamp = nSamp,
+            p_adj_method = p_adj_method
+        )
+    }
+    
     return(tpcaObj)
 }
 
@@ -190,10 +228,20 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
         
 }
 
-# testForComplexCoAggregation <- function(tpcaObj){
-#     
-# }
-# 
+.testForComplexCoAggregation <- function(tpcaObj, 
+                                        minCount = 3,
+                                        nSamp = 10000,
+                                        p_adj_method = "BH"){
+    tpcaObj <- .intersectComplexAnnotation(
+        tpcaObj, minCount = minCount)
+    tpcaObj <- .setBackgroundDistribution(
+        tpcaObj, nSamp = nSamp
+    )
+    tpcaObj <- .computeTpcaResultTable(
+        tpcaObj, p_adj_method = p_adj_method
+    )
+}
+
 .intersectComplexAnnotation <- function(tpcaObj, minCount = 3){
     caDf <- tpcaObj@ComplexAnnotation
     caDfFil <- filter(
@@ -208,7 +256,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .setBackgroundDistribution <- function(tpcaObj, nSamp = 10000){
-    uniqueMembersN <- unique(tpcaObj@ComplexAnnotation$n)
+    uniqueMembersN <- unique(tpcaObj@ComplexAnnotation$count)
     tpcaObj@ComplexBackgroundDistributionList <- 
         .createBackgroundDistList(distMat = tpcaObj@DistMat,
                                   nMemVec = uniqueMembersN)
@@ -231,6 +279,105 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     })
     return(samplesOfN)
 }
+
+.computeTpcaResultTable <- function(tpcaObj, p_adj_method = "BH"){
+    tpca_tab <- .getMeanDistVals4Complexes(
+        complexAnno = tpcaObj@ComplexAnnotation,
+        distMat = tpcaObj@DistMat
+    )
+    tpcaObj@tpcaResultTable <- .computeDistPValue(
+        tpcaDf = tpca_tab,
+        backgList = tpcaObj@ComplexBackgroundDistributionList,
+        p_adj_method = p_adj_method
+    )
+    return(tpcaObj)
+}
+
+#' @import dplyr
+.getMeanDistVals4Complexes <- function(complexAnno, distMat){
+    unique_complexes <- unique(complexAnno$id)
+    complex_table <- bind_rows(lapply(unique_complexes, function(cm_id){
+        x <- filter(complexAnno, id == cm_id)$protein
+        x_dim <- length(x)
+        ids <- rownames(distMat) %in% x
+        mean_dist <- mean(distMat[ids, ids][
+            upper.tri(matrix(0, ncol = x_dim, nrow = x_dim))])
+        out_tab <- tibble(
+            complex_name = cm_id,
+            count = filter(complexAnno, id == cm_id)$count[1],
+            mean_dist = mean_dist
+        )
+        return(out_tab)
+    }))
+    return(complex_table)
+}
+
+#' @import dplyr
+.computeDistPValue <- function(tpcaDf, backgList, 
+                               p_adj_method = "BH"){
+    tpcaDf <- tpcaDf %>% 
+        rowwise() %>% 
+        mutate(p_value = length(which(backgList[[as.character(count)]] <= 
+                                          mean_dist))/
+                   length(backgList[[as.character(count)]])) %>% 
+        ungroup %>% 
+        mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+    
+    return(tpcaDf)
+}
+
+#' Plot TPCA analysis results
+#' 
+#' @param tpcaObj a tpcaObj after having performed
+#' a differential analysis, see \code{runDiffTPCA}
+#' @param alpha significance level / FDR at which 
+#' null hypothesis should be rejected
+#' 
+#' @return ggplot displaying a volcano plot
+#' 
+#' @import ggplot2
+#' @import dplyr
+#' @export
+#' @examples 
+#' library(dplyr)
+#' library(Biobase)
+#' 
+#' m1 <- matrix(1:28, ncol = 4)
+#' m2 <- matrix(2:25, ncol = 4)
+#' m3 <- matrix(c(2:10, 1:19), ncol = 4)
+#' 
+#' rownames(m1) <- 1:7
+#' rownames(m2) <- 3:8
+#' rownames(m3) <- 2:8
+#' 
+#' mat_list <- list(
+#'     m1, m2, m3
+#' )
+#' 
+#' complex_anno <- tibble(
+#'     protein = c("3", "4", "5", 
+#'        "4", "5", "6", "7"),
+#'     id = c(rep("1", 3), rep("2", 4)),
+#'     count = c(rep(3, 3), rep(4, 4)))
+#' 
+#' tpca_result <- runTPCA(
+#'   mat_list, complexAnno = complex_anno)
+#' 
+#' plotTpcaVolcano(tpca_result)
+#' 
+plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
+    plot_df <- tpcaObj@tpcaResultTable
+    
+    p <- ggplot(plot_df, aes(x = mean_dist, -log10(p_value))) + 
+        geom_point(color = "gray", alpha = 0.25) + 
+        geom_point(data = filter(plot_df, p_adj < alpha)) + 
+        theme_bw() +
+        labs(x = "mean distance",
+             y = expression('-log'[10]*'('*italic(p)*' value)'))
+    
+    return(p)
+}
+
 
 # plotComplexRoc <- function(tpcaObj){
 #     
@@ -667,6 +814,8 @@ runDiffTPCA <- function(objList,
 #' @param xlimit numeric vector with two elements
 #' determing the x-axis limits, only is implemented
 #' if setXLim is set to TRUE
+#' @param alpha significance level / FDR at which 
+#' null hypothesis should be rejected
 #' 
 #' @return ggplot displaying a volcano plot
 #' 
@@ -717,13 +866,14 @@ runDiffTPCA <- function(objList,
 #' plotDiffTpcaVolcano(diff_tpca)
 #' 
 plotDiffTpcaVolcano <- function(tpcaObj, 
+                                alpha = 0.1,
                                 setXLim  = FALSE, 
                                 xlimit = c(-0.75, 0.75)){
     plot_df <- tpcaObj@diffTpcaResultTable
     
     p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.25) + 
-        geom_point(data = filter(plot_df, p_adj < 0.1)) + 
+        geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
         labs(x = expression('RSS'^c1* ' - RSS'^c2*''),
              y = expression('-log'[10]*'('*italic(p)*' value)'))

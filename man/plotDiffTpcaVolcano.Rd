@@ -4,11 +4,15 @@
 \alias{plotDiffTpcaVolcano}
 \title{Plot differential TPCA analysis results}
 \usage{
-plotDiffTpcaVolcano(tpcaObj, setXLim = FALSE, xlimit = c(-0.75, 0.75))
+plotDiffTpcaVolcano(tpcaObj, alpha = 0.1, setXLim = FALSE,
+  xlimit = c(-0.75, 0.75))
 }
 \arguments{
 \item{tpcaObj}{a tpcaObj after having performed
 a differential analysis, see \code{runDiffTPCA}}
+
+\item{alpha}{significance level / FDR at which 
+null hypothesis should be rejected}
 
 \item{setXLim}{logical determining whether
 x-axis limits should be set according to xlimit}

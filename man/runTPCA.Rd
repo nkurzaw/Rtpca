@@ -5,7 +5,9 @@
 \title{Run the TPCA analysis}
 \usage{
 runTPCA(objList, complexAnno = NULL, ppiAnno = NULL,
-  rownameCol = NULL, summaryFUN = median, distMethod = "euclidean")
+  rownameCol = NULL, summaryFUN = median, distMethod = "euclidean",
+  doRocAnalysis = TRUE, minCount = 3, nSamp = 10000,
+  p_adj_method = "BH")
 }
 \arguments{
 \item{objList}{inout list of objects, e.g.
@@ -27,6 +29,25 @@ across replicates, default is median}
 
 \item{distMethod}{method to use within dist function,
 default is 'euclidean'}
+
+\item{doRocAnalysis}{logical indicating whether a ROC 
+analysis should be performed which can be used to assess 
+the predictive power of the dataset for protein-protein
+interactions / protein complexes based on distanc between
+melting curves of protein interactions partners}
+
+\item{minCount}{integer indicating how many subunits 
+of a complex should be qunatified to inlucde it into the
+analysis, default is 3}
+
+\item{nSamp}{integer indicating the number of random samples
+which should be performed to estimate empirical null 
+distributions, default is 10000}
+
+\item{p_adj_method}{character string indicating a valid 
+method to be used for multiple testing adjusment, default 
+is "BH" which makes p.adjust use benjamini-hochberg, for 
+additional options check ?p.adjust}
 }
 \value{
 an object of class tpcaResult
