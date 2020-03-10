@@ -101,6 +101,9 @@ setMethod("show", "tpcaResult",
               cat('Slot "distMethod":', ifelse(!is.na(object@distMethod), 
                                                object@distMethod, "not specified") , "\n")
               
+              cat('Slot "tpcaResultTable" of class:', class(object@tpcaResultTable), 
+                  'with dim:', dim(object@tpcaResultTable), "\n")
+              
               cat('Slot "diffTpcaResultTable" of class:', class(object@diffTpcaResultTable), 
                   'with dim:', dim(object@diffTpcaResultTable), "\n")
           })
