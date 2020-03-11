@@ -180,7 +180,7 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' Plot PPI ROC curve
 #' @param tpcaObj tpcaResult object
 #' @param computeAUC logical parameter indicating
-#' whether areau under the ROC should be computed
+#' whether area under the ROC should be computed
 #' and indicated in the lower right corner of the 
 #' plot
 #' 
@@ -513,16 +513,9 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 #' @import dplyr
 #' @import tidyr
 .createComplexRocTable <- function(tpcaObj, 
-                                   nPermuts = 5,
-                                   p_adj_method = "BH"){
+                                   nPermuts = 5){
     perm_tpca_tab_list <- .getMeanDistVals4RandComplexes(
         tpcaObj, nPermuts = nPermuts)
-    
-    tpcaObj@tpcaResultTable <- .computeDistPValue(
-        tpcaDf = tpca_tab,
-        backgList = tpcaObj@ComplexBackgroundDistributionList,
-        p_adj_method = p_adj_method
-    )
     
     tpcaObj@ComplexRocTable <- .computeComplexRocTable(
         tpcaObj = tpcaObj,
@@ -588,7 +581,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 #' Plot Complex ROC curve
 #' @param tpcaObj tpcaResult object
 #' @param computeAUC logical parameter indicating
-#' whether areau under the ROC should be computed
+#' whether area under the ROC should be computed
 #' and indicated in the lower right corner of the 
 #' plot
 #' 

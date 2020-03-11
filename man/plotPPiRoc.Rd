@@ -10,7 +10,7 @@ plotPPiRoc(tpcaObj, computeAUC = FALSE)
 \item{tpcaObj}{tpcaResult object}
 
 \item{computeAUC}{logical parameter indicating
-whether areau under the ROC should be computed
+whether area under the ROC should be computed
 and indicated in the lower right corner of the 
 plot}
 }
