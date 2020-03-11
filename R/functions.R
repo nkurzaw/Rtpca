@@ -90,16 +90,11 @@ runTPCA <- function(objList,
         distMethod = distMethod
     )
     if(!is.null(ppiAnno) & doRocAnalysis){
-        message("\nPerformning ROC analysis. \n")
+        message("\nPerformning PPi ROC analysis. \n")
         tpcaObj <- .createPPiRocTable(
             tpcaObj = tpcaObj
         )
     }
-    # else if(!is.null(complexAnno) & doRocAnalysis){
-    #     tpcaObj <- .createPPiRocTable(
-    #         tpcaObj = tpcaObj
-    #     )
-    # }
     if(!is.null(complexAnno)){
         message("\nTesting for complex co-aggregation. \n")
         tpcaObj <- .testForComplexCoAggregation(
@@ -108,6 +103,12 @@ runTPCA <- function(objList,
             nSamp = nSamp,
             p_adj_method = p_adj_method
         )
+        if(doRocAnalysis){
+            message("\nPerformning Complex ROC analysis. \n")
+            tpcaObj <- .createComplexRocTable(
+                tpcaObj = tpcaObj
+            )
+        }
     }
     
     return(tpcaObj)
@@ -218,7 +219,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
         geom_line(aes(x, y),
                   color = "gray",
                   data = tibble(x = 0:1, y = 0:1),
-                  linetype = "dashed")
+                  linetype = "dashed") +
+        theme_bw()
     if(computeAUC){
         p <- p + geom_text(aes(x, y, label = label), 
                            data = tibble(x = 0.75, y = 0.1,
@@ -379,9 +381,6 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 }
 
 
-# plotComplexRoc <- function(tpcaObj){
-#     
-# }
 
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
                                   summaryFUN = median,
@@ -510,6 +509,135 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     return(tpcaObj)
 }
 
+
+#' @import dplyr
+#' @import tidyr
+.createComplexRocTable <- function(tpcaObj, 
+                                   nPermuts = 5,
+                                   p_adj_method = "BH"){
+    perm_tpca_tab_list <- .getMeanDistVals4RandComplexes(
+        tpcaObj, nPermuts = nPermuts)
+    
+    tpcaObj@tpcaResultTable <- .computeDistPValue(
+        tpcaDf = tpca_tab,
+        backgList = tpcaObj@ComplexBackgroundDistributionList,
+        p_adj_method = p_adj_method
+    )
+    
+    tpcaObj@ComplexRocTable <- .computeComplexRocTable(
+        tpcaObj = tpcaObj,
+        tpca_tab = tpcaObj@tpcaResultTable, 
+        perm_tpca_tab_list = perm_tpca_tab_list
+    )
+    
+    return(tpcaObj)
+}
+
+#' @import dplyr
+.permuteComplexAnno <- function(complexAnno){
+    permComplexAnno <- complexAnno %>% 
+        mutate(protein = sample(protein)) %>% 
+        group_by(id) %>% 
+        filter(!duplicated(protein)) %>% 
+        ungroup
+    return(permComplexAnno)
+}
+
+.getMeanDistVals4RandComplexes <- function(tpcaObj, nPermuts = 5){
+    perm_tpca_tab_list <- lapply(seq_len(nPermuts), function(np){
+        perm_complex_anno <- 
+            .permuteComplexAnno(tpcaObj@ComplexAnnotation)
+        perm_tpca_tab <- .getMeanDistVals4Complexes(
+            complexAnno = perm_complex_anno,
+            distMat = tpcaObj@DistMat
+        )
+        return(perm_tpca_tab)
+        
+    })
+    return(perm_tpca_tab_list)
+}
+
+
+.computeComplexRocTable <- function(tpcaObj, tpca_tab, perm_tpca_tab_list){
+    complex_roc_df <- bind_rows(lapply(seq_len(length(perm_tpca_tab_list)), function(i){
+                                           
+        perm_tpca_tab_i <-  .computeDistPValue(
+            tpcaDf = perm_tpca_tab_list[[i]],
+            backgList = tpcaObj@ComplexBackgroundDistributionList,
+            p_adj_method = "BH"
+        )         
+                                           
+        roc_df <- bind_rows(
+            tpca_tab %>% 
+                mutate(category = "TP"),
+            perm_tpca_tab_i %>% 
+                mutate(category = "FP")) %>% 
+            arrange(p_value, mean_dist) %>% 
+            mutate(rank = seq_len(n()),
+                   tp_count = cumsum(as.numeric(category == "TP")),
+                   fp_count = cumsum(as.numeric(category == "FP"))) %>% 
+            mutate(TPR = tp_count / nrow(tpca_tab),
+                   FPR = (fp_count/nrow(perm_tpca_tab_i))) 
+    })) %>% 
+        group_by(rank) %>% 
+        summarize(TPR = mean(TPR, na.rm = TRUE),
+                  FPR = mean(FPR, na.rm = TRUE))
+    return(complex_roc_df)
+}
+
+#' Plot Complex ROC curve
+#' @param tpcaObj tpcaResult object
+#' @param computeAUC logical parameter indicating
+#' whether areau under the ROC should be computed
+#' and indicated in the lower right corner of the 
+#' plot
+#' 
+#' @return ggplot object of a receiver operating
+#' curve (ROC)
+#' 
+#' @export
+#' 
+#' @import ggplot2
+#' @importFrom pROC auc
+#' 
+#' @examples 
+#' rocTab = data.frame(
+#'     TPR = c(0, 0.1, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
+#'     FPR = c(0, 0.05, 0.1, 0.2, 0.5, 0.7, 0.9, 1)
+#' )
+#' 
+#' tpcaTest <- new(
+#'     "tpcaResult",
+#'     ComplexRocTable = rocTab)
+#' 
+#' plotComplexRoc(tpcaTest)
+#' 
+plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
+    rocTab <- tpcaObj@ComplexRocTable
+    if(computeAUC){
+        aucText <- paste0("AUC = ", as.character(
+            round(.simpleAuc(rocTab$FPR, rocTab$TPR), 3)))
+    }
+    p <- ggplot(rocTab, 
+                aes(FPR, TPR)) + 
+        geom_path() +
+        geom_line(aes(x, y),
+                  color = "gray",
+                  data = tibble(x = 0:1, y = 0:1),
+                  linetype = "dashed") +
+        theme_bw() 
+    if(computeAUC){
+        p <- p + geom_text(aes(x, y, label = label), 
+                           data = tibble(x = 0.75, y = 0.1,
+                                         label = aucText))
+    }
+    return(p)
+    
+}
+
+.simpleAuc <- function(x, y){
+    sum(diff(x) * (head(y,-1)+tail(y,-1)))/2
+}
 
 #' @importFrom Biobase ExpressionSet
 #' @importFrom Biobase exprs
