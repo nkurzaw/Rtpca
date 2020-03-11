@@ -10,6 +10,7 @@
 #' @slot PPiAnnotation data.frame.
 #' @slot PPiRocTable data.frame
 #' @slot PPiRocTableAnno data.frame
+#' @slot ComplexRocTable data.frame
 #' @slot summaryFUN function.
 #' @slot distMethod character.
 #' @slot tpcaResultTable data.frame.
@@ -47,6 +48,7 @@ tpcaResult <- setClass("tpcaResult",
                           PPiAnnotation = "data.frame",
                           PPiRocTable = "data.frame", #"DelayedMatrix",
                           PPiRocTableAnno = "data.frame", #"DelayedMatrix",
+                          ComplexRocTable = "data.frame",
                           summaryFUN = "function",
                           distMethod = "character",
                           tpcaResultTable = "data.frame",
@@ -94,6 +96,9 @@ setMethod("show", "tpcaResult",
               
               cat('Slot "PPiRocTableAnno" of class:', class(object@PPiRocTableAnno), 
                   'with dim:', dim(object@PPiRocTableAnno), "\n")
+              
+              cat('Slot "ComplexRocTable" of class:', class(object@ComplexRocTable), 
+                  'with dim:', dim(object@ComplexRocTable), "\n")
               
               cat('Slot "summaryFUN":', ifelse(!is.null(try(object@summaryFUN(), silent = TRUE)), 
                                                deparse(object@summaryFUN)[2], "not specified"), "\n")

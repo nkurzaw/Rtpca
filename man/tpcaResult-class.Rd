@@ -37,6 +37,8 @@ S4 TPCA Result Class
 
 \item{\code{PPiRocTableAnno}}{data.frame}
 
+\item{\code{ComplexRocTable}}{data.frame}
+
 \item{\code{summaryFUN}}{function.}
 
 \item{\code{distMethod}}{character.}
