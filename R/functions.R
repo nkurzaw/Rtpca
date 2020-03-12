@@ -55,8 +55,8 @@
 #' )
 #' 
 #' ppi_anno <- tibble(
-#'     gene_name1 = "2",
-#'     gene_name2 = "3",
+#'     x = "2",
+#'     y = "3",
 #'     combined_score = 700,
 #'     pair = "2:3")
 #' 
@@ -89,11 +89,18 @@ runTPCA <- function(objList,
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
-    if(!is.null(ppiAnno) & doRocAnalysis){
-        message("\nPerformning PPi ROC analysis. \n")
-        tpcaObj <- .createPPiRocTable(
-            tpcaObj = tpcaObj
-        )
+    if(!is.null(ppiAnno)){
+        message("\nTesting for complex co-aggregation. \n")
+        tpcaObj <- .testForPPiCoAggregation(
+            tpcaObj = tpcaObj, 
+            nSamp = nSamp,
+            p_adj_method = p_adj_method)
+        if(doRocAnalysis){
+            message("\nPerformning PPi ROC analysis. \n")
+            tpcaObj <- .createPPiRocTable(
+                tpcaObj = tpcaObj
+            )
+        }
     }
     if(!is.null(complexAnno)){
         message("\nTesting for complex co-aggregation. \n")
@@ -230,6 +237,29 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
         
 }
 
+.testForPPiCoAggregation <- function(tpcaObj, nSamp = 10000,
+                                     p_adj_method = "BH"){
+    tpcaObj@ComplexAnnotation <- 
+        .adaptComplexAnnoFromPPi(
+            tpcaObj@PPiAnnotation)
+    
+    tpcaObj <-.testForComplexCoAggregation(
+        tpcaObj = tpcaObj, 
+        minCount = 2, 
+        nSamp = nSamp,
+        p_adj_method = p_adj_method
+    )
+}
+
+.adaptComplexAnnoFromPPi <- function(ppiAnno){
+    complex_anno <- ppiAnno %>% 
+        dplyr::select(pair, x, y) %>% 
+        gather(key, value, -pair) %>% 
+        arrange(pair) %>% 
+        dplyr::select(id = pair, protein = value)
+    return(complex_anno)
+}
+
 .testForComplexCoAggregation <- function(tpcaObj, 
                                         minCount = 3,
                                         nSamp = 10000,
@@ -246,8 +276,10 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .intersectComplexAnnotation <- function(tpcaObj, minCount = 3){
     caDf <- tpcaObj@ComplexAnnotation
-    caDfFil <- filter(
-        caDf, protein %in% 
+    caDfFil <- caDf %>% 
+        distinct() %>% 
+        filter(
+            protein %in% 
             tpcaObj@CommonFeatures) %>% 
         group_by(id) %>% 
         mutate(count = n()) %>% 
@@ -443,10 +475,14 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
                      "One of them is required."),
                    collapse = " "))
     }else if(!is.null(complexAnno) & !is.null(ppiAnno)){
-        tpcaObj <- new("tpcaResult",
-                       ObjList = objList,
-                       ComplexAnnotation = complexAnno)
-        return(tpcaObj)
+        stop(paste(c("Both complex annotationand PPI", 
+                     "annotation were supplied!\n",
+                     "Please only supply one of them!"),
+                   collapse = " "))
+        # tpcaObj <- new("tpcaResult",
+        #                ObjList = objList,
+        #                ComplexAnnotation = complexAnno)
+        # return(tpcaObj)
     }else if(!is.null(complexAnno)){
         tpcaObj <- new("tpcaResult",
                        ObjList = objList,

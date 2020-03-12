@@ -77,8 +77,8 @@ mat_list <- list(
 )
 
 ppi_anno <- tibble(
-    gene_name1 = "2",
-    gene_name2 = "3",
+    x = "2",
+    y = "3",
     combined_score = 700,
     pair = "2:3")
 
