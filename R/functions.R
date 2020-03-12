@@ -403,7 +403,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     plot_df <- tpcaObj@tpcaResultTable
     
     p <- ggplot(plot_df, aes(x = mean_dist, -log10(p_value))) + 
-        geom_point(color = "gray", alpha = 0.25) + 
+        geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
         labs(x = "mean distance",
@@ -1029,7 +1029,7 @@ plotDiffTpcaVolcano <- function(tpcaObj,
     plot_df <- tpcaObj@diffTpcaResultTable
     
     p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
-        geom_point(color = "gray", alpha = 0.25) + 
+        geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
         labs(x = expression('RSS'^c1* ' - RSS'^c2*''),
