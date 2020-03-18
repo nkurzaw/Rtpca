@@ -10,7 +10,7 @@ interaciton score euqal or higher than 700}
 x, y (gene symbol of interactors), combined_score, pair
 (unique pair id)}
 \usage{
-string_ppi_df
+data("string_ppi_df")
 }
 \description{
 data frame assigning proteins to 

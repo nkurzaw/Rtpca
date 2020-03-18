@@ -8,7 +8,7 @@ et al.}
 \format{data frame with columns ensembl_id, protein
 and id (complex identifier)}
 \usage{
-ori_et_al_complexes_df
+data("ori_et_al_complexes_df")
 }
 \description{
 data frame assigning proteins to 

@@ -9,7 +9,7 @@ complexes by Ori et al.}
 \format{data frame with columns complex_name, x, y, 
 pair (unique pair id)}
 \usage{
-ori_et_al_complex_ppis
+data("ori_et_al_complex_ppis")
 }
 \description{
 data frame assigning proteins to (in)directly 
