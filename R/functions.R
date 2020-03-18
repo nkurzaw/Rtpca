@@ -76,7 +76,7 @@ runTPCA <- function(objList,
                     nSamp = 10000,
                     p_adj_method = "BH"
                     ){
-    message("Checking function arguments. \n")
+    message("Checking input arguments. \n")
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
         complexAnno = complexAnno,
@@ -96,7 +96,7 @@ runTPCA <- function(objList,
             nSamp = nSamp,
             p_adj_method = p_adj_method)
         if(doRocAnalysis){
-            message("\nPerformning PPi ROC analysis. \n")
+            message("\nPerforming PPi ROC analysis. \n")
             tpcaObj <- .createPPiRocTable(
                 tpcaObj = tpcaObj
             )
@@ -933,28 +933,31 @@ runDiffTPCA <- function(objList,
                         distMethod = "euclidean",
                         n = 10000,
                         p_adj_method = "BH"){
+    message("Checking input arguments. \n")
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
         contrastList = contrastList,
         complexAnno = NULL,
         ppiAnno = ppiAnno
     )
+    message("Creating distance matrices. \n")
     tpcaObj <- .createDistMatTpcaObj(
         tpcaObj = tpcaObj, 
         rownameCol = rownameCol, 
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
+    message("Comparing annoated protein-pairs across conditions. \n")
     combo_df <- .compareConditions(
         tpcaObj = tpcaObj, 
         prot_pairs = ppiAnno
     )
-    
+    message("Comparing random protein-pairs across conditions. \n")
     combo_rand_df <- .compareConditionsRandom(
         tpcaObj = tpcaObj, 
         n = n
     )
-    
+    message("Generating result table. \n")
     tpcaObj@diffTpcaResultTable <- .computeEmpiricalPValue(
         combo_df, 
         combo_rand_df, 
