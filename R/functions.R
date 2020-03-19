@@ -350,6 +350,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 .computeDistPValue <- function(tpcaDf, backgList, 
                                p_adj_method = "BH"){
     tpcaDf <- tpcaDf %>% 
+        na.omit() %>% 
         rowwise() %>% 
         mutate(p_value = length(which(backgList[[as.character(count)]] <= 
                                           mean_dist))/
