@@ -34,9 +34,8 @@
 #' interacting proteins 
 #' @references Jensen et al. (2009), Nucleic Acids Research, 
 #' 37, D412–D416
-#' @format data frame with columns protein1/2 (ensembl_id), 
-#' x, y (gene symbol of interactors), combined_score, pair
-#' (unique pair id)
+#' @format data frame with columns x, y (gene symbol of 
+#' interactors), combined_score, pair (unique pair id)
 #' @examples data("string_ppi_df")
 #' @usage data("string_ppi_df")
 "string_ppi_df"
