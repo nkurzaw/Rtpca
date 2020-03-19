@@ -7,26 +7,47 @@ author:
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 package: Rtpca
 output:
-    BiocStyle::html_document
+  BiocStyle::html_document:
+    keep_md: yes
+  BiocStyle::pdf_document: 
+    default
 vignette: >
     %\VignetteIndexEntry{Introduction to Rtpca}
     %\VignetteEngine{knitr::rmarkdown}
     %VignetteEncoding{UTF-8}
+bibliography: refs.bib
+csl: cell.csl
+header-includes: 
+- \usepackage{placeins}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Installation
+
+Install the development version of the package from Github.
+```{r, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(“nkurzaw/Rtpca”)
+```
+
+2. Load the package into your R session.
+```{r Load, message=FALSE}
+library(Rtpca)
+```
+
 # Introduction
 
-`Rtpca` 
+The `Rtpca` package contains functions to analyze thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] experiments in the light of protein-protein interactions (PPIs). It makes use of a method termed thermal proximity coaggregation analysis (TPCA) [@Tan2018] and also allows to test for changes in PPIs across different conditions.
 
-This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out:  
+This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
 
+We also load the `TPP` package to illustrate how to import TPP data with the Bioconductor package and then input in into the `Rtpca` functions.
 ```{r, message=FALSE, warning=FALSE}
 library(TPP)
-library(Rtpca)
 ```
 
 ## Import Thermal proteome profiling data using the TPP package
@@ -64,6 +85,8 @@ vehTPCA <- runTPCA(
     ppiAnno = ori_et_al_complex_ppis
 )
 ```
+Note: it is not necessary that your data has the format of the TPP package (ExpressionSet), you can also supply the function with a list of matrices of data frames (in the case of data frames you need to additionally indicate with column contains the protein or gene names).
+
 We can also run TPCA to test for coaggregation of protein complexes like this:
 ```{r}
 data("ori_et_al_complexes_df")
@@ -111,3 +134,4 @@ As mentioned above, this vignette includes only a very minimal example, have a l
 sessionInfo()
 ```
 
+# References
