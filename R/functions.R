@@ -948,7 +948,7 @@ runDiffTPCA <- function(objList,
         summaryFUN = summaryFUN,
         distMethod = distMethod
     )
-    message("Comparing annoated protein-pairs across conditions. \n")
+    message("Comparing annotated protein-pairs across conditions. \n")
     combo_df <- .compareConditions(
         tpcaObj = tpcaObj, 
         prot_pairs = ppiAnno
