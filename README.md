@@ -18,7 +18,7 @@ library(Rtpca)
 
 # Introduction
 
-The `Rtpca` package contains functions to analyze thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] experiments in the light of protein-protein interactions (PPIs). It makes use of a method termed thermal proximity coaggregation analysis (TPCA) [@Tan2018] and also allows to test for changes in PPIs across different conditions.
+The `Rtpca` package contains functions to analyze thermal proteome profiling (TPP) experiments in the light of protein-protein interactions (PPIs). It makes use of a method termed thermal proximity coaggregation analysis (TPCA) and also allows to test for changes in PPIs across different conditions.
 
 This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
 
