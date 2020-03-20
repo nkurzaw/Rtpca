@@ -774,8 +774,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         dist_df_c2 %>% 
             dplyr::select(pair, valueC2 = value), 
         by = "pair") %>% 
-        mutate(rssC1 = sqrt(valueC1),
-               rssC2 = sqrt(valueC2)) %>% 
+        mutate(rssC1 = valueC1^2,
+               rssC2 = valueC2^2) %>% 
         mutate(rssC1_rssC2 = rssC1 - rssC2) %>% 
         rowwise() %>% 
         mutate(min_rssC1_rssC2 = min(c(rssC1, rssC2))) %>% 
