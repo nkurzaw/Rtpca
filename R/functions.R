@@ -1039,11 +1039,11 @@ plotDiffTpcaVolcano <- function(tpcaObj,
                                 xlimit = c(-0.75, 0.75)){
     plot_df <- tpcaObj@diffTpcaResultTable
     
-    p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(rssC2), -log10(p_value))) + 
+    p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(valueC2), -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
-        labs(x = expression('RSS'^c1* ' - RSS'^c2*''),
+        labs(x = expression(sqrt(italic(d)[c1])~ ' - ' sqrt(italic(d)[c2])),
              y = expression('-log'[10]*'('*italic(p)*' value)'))
     
     if(setXLim){
