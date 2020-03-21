@@ -5,7 +5,7 @@
 \title{Create distance matrix of all vs all protein 
 melting profiles}
 \usage{
-createDistMat(objList, rownameCol = NULL, summaryFUN = median,
+createDistMat(objList, rownameCol = NULL, summaryMethod = "median",
   distMethod = "euclidean")
 }
 \arguments{
@@ -17,8 +17,9 @@ data.frames, tibbles and ExpressionSets}
 this parameter takes in the name (character) of the column 
 specifying protein names or ids}
 
-\item{summaryFUN}{function to use to summarize measurements
-across replicates, default is median}
+\item{summaryMethod}{character string indicating a method 
+to use to summarize measurements across replicates, 
+default is "median", other options are c("mean", "rbind")}
 
 \item{distMethod}{method to use within dist function,
 default is 'euclidean'}

@@ -2,6 +2,8 @@
 #'
 #' @slot ObjList list.
 #' @slot ContrastList list.
+#' @slot ctrlCondName character.
+#' @slot contrastCondName character.
 #' @slot DistMat matrix.
 #' @slot ContrastDistMat matrix
 #' @slot CommonFeatures vector.
@@ -11,7 +13,7 @@
 #' @slot PPiRocTable data.frame
 #' @slot PPiRocTableAnno data.frame
 #' @slot ComplexRocTable data.frame
-#' @slot summaryFUN function.
+#' @slot summaryMethod character.
 #' @slot distMethod character.
 #' @slot tpcaResultTable data.frame.
 #' @slot diffTpcaResultTable data.frame.
@@ -40,6 +42,8 @@ tpcaResult <- setClass("tpcaResult",
                       slots = list(
                           ObjList = "list",
                           ContrastList = "list",
+                          ctrlCondName = "character",
+                          contrastCondName = "character",
                           CommonFeatures = "vector",
                           DistMat = "matrix", #"DelayedMatrix",
                           ContrastDistMat = "matrix",
@@ -49,7 +53,7 @@ tpcaResult <- setClass("tpcaResult",
                           PPiRocTable = "data.frame", #"DelayedMatrix",
                           PPiRocTableAnno = "data.frame", #"DelayedMatrix",
                           ComplexRocTable = "data.frame",
-                          summaryFUN = "function",
+                          summaryMethod = "character",
                           distMethod = "character",
                           tpcaResultTable = "data.frame",
                           diffTpcaResultTable = "data.frame"))
@@ -100,8 +104,7 @@ setMethod("show", "tpcaResult",
               cat('Slot "ComplexRocTable" of class:', class(object@ComplexRocTable), 
                   'with dim:', dim(object@ComplexRocTable), "\n")
               
-              cat('Slot "summaryFUN":', ifelse(!is.null(try(object@summaryFUN(), silent = TRUE)), 
-                                               deparse(object@summaryFUN)[2], "not specified"), "\n")
+              cat('Slot "summaryMethod":', object@summaryMethod, "\n")
               
               cat('Slot "distMethod":', ifelse(!is.na(object@distMethod), 
                                                object@distMethod, "not specified") , "\n")

@@ -5,7 +5,7 @@
 \title{Run differential TPCA analysis}
 \usage{
 runDiffTPCA(objList, contrastList, ppiAnno = NULL, rownameCol = NULL,
-  summaryFUN = median, distMethod = "euclidean", n = 10000,
+  summaryMethod = "median", distMethod = "euclidean", n = 10000,
   p_adj_method = "BH")
 }
 \arguments{
@@ -24,8 +24,9 @@ protein-protein interactions (PPI) to test}
 this parameter takes in the name (character) of the column 
 specifying protein names or ids}
 
-\item{summaryFUN}{function to use to summarize measurements
-across replicates, default is median}
+\item{summaryMethod}{character string indicating a method 
+to use to summarize measurements across replicates, 
+default is "median", other options are c("mean", "rbind")}
 
 \item{distMethod}{method to use within dist function,
 default is 'euclidean'}

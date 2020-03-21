@@ -21,6 +21,10 @@ S4 TPCA Result Class
 
 \item{\code{ContrastList}}{list.}
 
+\item{\code{ctrlCondName}}{character.}
+
+\item{\code{contrastCondName}}{character.}
+
 \item{\code{DistMat}}{matrix.}
 
 \item{\code{ContrastDistMat}}{matrix}
@@ -39,7 +43,7 @@ S4 TPCA Result Class
 
 \item{\code{ComplexRocTable}}{data.frame}
 
-\item{\code{summaryFUN}}{function.}
+\item{\code{summaryMethod}}{character.}
 
 \item{\code{distMethod}}{character.}
 

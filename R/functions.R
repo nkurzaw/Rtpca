@@ -10,8 +10,9 @@
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids
-#' @param summaryFUN function to use to summarize measurements
-#' across replicates, default is median
+#' @param summaryMethod character string indicating a method 
+#' to use to summarize measurements across replicates, 
+#' default is "median", other options are c("mean", "rbind")
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
 #' @param doRocAnalysis logical indicating whether a ROC 
@@ -69,7 +70,7 @@ runTPCA <- function(objList,
                     complexAnno = NULL,
                     ppiAnno = NULL,
                     rownameCol = NULL,
-                    summaryFUN = median,
+                    summaryMethod = "median",
                     distMethod = "euclidean",
                     doRocAnalysis = TRUE,
                     minCount = 3,
@@ -86,7 +87,7 @@ runTPCA <- function(objList,
     tpcaObj <- .createDistMatTpcaObj(
         tpcaObj = tpcaObj, 
         rownameCol = rownameCol, 
-        summaryFUN = summaryFUN,
+        summaryMethod = summaryMethod,
         distMethod = distMethod
     )
     if(!is.null(ppiAnno)){
@@ -130,8 +131,9 @@ runTPCA <- function(objList,
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids
-#' @param summaryFUN function to use to summarize measurements
-#' across replicates, default is median
+#' @param summaryMethod character string indicating a method 
+#' to use to summarize measurements across replicates, 
+#' default is "median", other options are c("mean", "rbind")
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
 #' 
@@ -170,7 +172,7 @@ runTPCA <- function(objList,
 #' @export
 #' @importFrom stats dist
 createDistMat <- function(objList, rownameCol = NULL, 
-                           summaryFUN = median,
+                           summaryMethod = "median",
                            distMethod = "euclidean"){
     common_rownames <-
         .getCommonRownames(objList, rownameCol = rownameCol)
@@ -178,7 +180,7 @@ createDistMat <- function(objList, rownameCol = NULL,
                             commonRownames = common_rownames,
                             rownameCol = rownameCol)
     summarized_mat <- .getSummarizedMat(matList = mat_list,
-                                        FUN = summaryFUN)
+                                        sumMethod = summaryMethod)
     dist_mat <- as.matrix(dist(summarized_mat,
                                method = distMethod))
     return(dist_mat)
@@ -356,6 +358,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
                                           mean_dist))/
                    length(backgList[[as.character(count)]])) %>% 
         ungroup %>% 
+        within(p_value[p_value == 0] <- .Machine$double.eps) %>% 
         mutate(p_adj = p.adjust(p_value, method = p_adj_method))
     
     return(tpcaDf)
@@ -416,7 +419,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 
 
 .createDistMatTpcaObj <- function(tpcaObj, rownameCol = NULL,
-                                  summaryFUN = median,
+                                  summaryMethod = "median",
                                   distMethod = "euclidean",
                                   cond = "c1"){
 
@@ -435,20 +438,20 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     distMat <- createDistMat(
         objList = tpcaObj@ObjList, 
         rownameCol = rownameCol, 
-        summaryFUN = summaryFUN,
+        summaryMethod = summaryMethod,
         distMethod = distMethod
     )
     if(length(tpcaObj@ContrastList) != 0){
         contrastDistMat <- createDistMat(
             objList = tpcaObj@ContrastList, 
             rownameCol = rownameCol, 
-            summaryFUN = summaryFUN,
+            summaryMethod = summaryMethod,
             distMethod = distMethod
         )
     }
     # chunkDim <- ifelse(ncol(distMat) < 250, 
     #                    ncol(distMat), 250)
-    tpcaObj@summaryFUN <- summaryFUN
+    tpcaObj@summaryMethod <- summaryMethod
     tpcaObj@distMethod <- distMethod
     tpcaObj@DistMat <- distMat 
     dimnames(tpcaObj@DistMat) <- dimnames(distMat)
@@ -727,13 +730,15 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 #' @importFrom stats median
-.getSummarizedMat <- function(matList, FUN = median){
+.getSummarizedMat <- function(matList, sumMethod = "median"){
     .checkMatDims(matList)
-    arr <- array(unlist(matList), 
-                 c(dim(matList[[1]]), length(matList)))
-    sumMat <- apply(arr, seq_len(2), FUN)
-    rownames(sumMat) <- rownames(matList[[1]])
-    colnames(sumMat) <- colnames(matList[[1]])
+    if(sumMethod == "median"){
+        arr <- array(unlist(matList), 
+                     c(dim(matList[[1]]), length(matList)))
+        sumMat <- apply(arr, seq_len(2), median)
+        rownames(sumMat) <- rownames(matList[[1]])
+        colnames(sumMat) <- colnames(matList[[1]])
+    }
     return(sumMat)
 }
 
@@ -851,6 +856,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         mutate(p_value = length(which(combo_rand_df$f_stat >= f_stat))/
                    nrow(combo_rand_df)) %>% 
         ungroup %>% 
+        within(p_value[p_value == 0] <- .Machine$double.eps) %>% 
         mutate(p_adj = p.adjust(p_value, method = p_adj_method))
     
     return(empirical_p_df)
@@ -869,8 +875,9 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids
-#' @param summaryFUN function to use to summarize measurements
-#' across replicates, default is median
+#' @param summaryMethod character string indicating a method 
+#' to use to summarize measurements across replicates, 
+#' default is "median", other options are c("mean", "rbind")
 #' @param distMethod method to use within dist function,
 #' default is 'euclidean'
 #' @param n number of random protein pair draws to obtain
@@ -930,7 +937,7 @@ runDiffTPCA <- function(objList,
                         contrastList,
                         ppiAnno = NULL,
                         rownameCol = NULL,
-                        summaryFUN = median,
+                        summaryMethod = "median",
                         distMethod = "euclidean",
                         n = 10000,
                         p_adj_method = "BH"){
@@ -945,7 +952,7 @@ runDiffTPCA <- function(objList,
     tpcaObj <- .createDistMatTpcaObj(
         tpcaObj = tpcaObj, 
         rownameCol = rownameCol, 
-        summaryFUN = summaryFUN,
+        summaryMethod = summaryMethod,
         distMethod = distMethod
     )
     message("Comparing annotated protein-pairs across conditions. \n")
@@ -1032,7 +1039,7 @@ plotDiffTpcaVolcano <- function(tpcaObj,
                                 xlimit = c(-0.75, 0.75)){
     plot_df <- tpcaObj@diffTpcaResultTable
     
-    p <- ggplot(plot_df, aes(x = rssC1_rssC2, -log10(p_value))) + 
+    p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(rssC2), -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
@@ -1045,3 +1052,8 @@ plotDiffTpcaVolcano <- function(tpcaObj,
     
     return(p)
 }
+
+
+# plotPPiProfiles <- function(tpcaObj, pair){
+#     cond1_df <- tpcaObj@objList
+# }
