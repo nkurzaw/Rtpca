@@ -471,6 +471,8 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 #' @importFrom methods new
 .checkAnnoArguments <- function(objList, 
                                 contrastList = list(),
+                                ctrlCondName = "control",
+                                contrastCondName = "treatment",
                                 complexAnno = NULL,
                                 ppiAnno = NULL){
     if(is.null(complexAnno) & is.null(ppiAnno)){
@@ -491,12 +493,16 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
         tpcaObj <- new("tpcaResult",
                        ObjList = objList,
                        ContrastList = contrastList,
+                       CtrlCondName = ctrlCondName,
+                       ContrastCondName = contrastCondName,
                        ComplexAnnotation = complexAnno)
         return(tpcaObj)
     }else if(!is.null(ppiAnno)){
         tpcaObj <- new("tpcaResult",
                        ObjList = objList,
                        ContrastList = contrastList,
+                       CtrlCondName = ctrlCondName,
+                       ContrastCondName = contrastCondName,
                        PPiAnnotation = ppiAnno)
         return(tpcaObj)
     }
@@ -870,6 +876,10 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @param contrastList input list of objects for
 #' comparison at e.g. different treatment condtion,
 #' same file formats work as for objList
+#' @param ctrlCondName character string indicating the name
+#' of the control condition, default is "control"
+#' @param contrastCondName character string indicating the name
+#' of the contrast condition, default is "treatment"
 #' @param ppiAnno data frame annotation known
 #' protein-protein interactions (PPI) to test 
 #' @param rownameCol in case the input objects are tibbles
@@ -935,6 +945,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' 
 runDiffTPCA <- function(objList, 
                         contrastList,
+                        ctrlCondName = "control",
+                        contrastCondName = "treatment",
                         ppiAnno = NULL,
                         rownameCol = NULL,
                         summaryMethod = "median",
@@ -945,6 +957,8 @@ runDiffTPCA <- function(objList,
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
         contrastList = contrastList,
+        ctrlCondName = ctrlCondName,
+        contrastCondName = contrastCondName,
         complexAnno = NULL,
         ppiAnno = ppiAnno
     )
@@ -1043,7 +1057,8 @@ plotDiffTpcaVolcano <- function(tpcaObj,
         geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
-        labs(x = expression(sqrt(italic(d)[c1])~ ' - ' ~sqrt(italic(d)[c2])),
+        labs(x = expression(sqrt(italic(d)[tpcaObj@CtrlCondName])~ ' - ' 
+                            ~sqrt(italic(d)[tpcaObj@ContrastCondName])),
              y = expression('-log'[10]*'('*italic(p)*' value)'))
     
     if(setXLim){
@@ -1055,5 +1070,27 @@ plotDiffTpcaVolcano <- function(tpcaObj,
 
 
 # plotPPiProfiles <- function(tpcaObj, pair){
+#     if(class(tpcaObj@ObjList[[1]])[1] == "ExpressionSet"){
+#         bind_rows(lapply(tpcaObj@ObjList, function(eset){
+#             sub_eset <- exprs(eset)[rownames(eset) %in% pair,]
+#             cond1_df <- sub_eset %>% 
+#                 tbl_df %>%
+#                 mutate(gene_name = rownames(sub_eset))
+#                 
+#         }))
+#     }else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
+#         lapply(tpcaObj@ObjList[1][[1]] %>%
+#             tbl_df %>%
+#             mutate(gene_name = rownames(tpcaObj@ObjList[1][[1]])) %>%
+#             filter(gene_name %in% c("PIK3R1", "CRK")) %>%
+#             gather(temperature, rel_value, -gene_name) %>%
+#             #mutate(temperature = as.numeric(gsub("Mock_", "", temperature))) %>%
+#             ggplot(aes(temperature, rel_value)) +
+#             geom_point(aes(color = gene_name)) +
+#             theme_bw()
+#     }else if((class(tpcaObj@ObjList[[1]])[1] %in% c("tbl_df")) &
+#              !is.null(rownameCol)){
+# 
+#     }
 #     cond1_df <- tpcaObj@objList
 # }

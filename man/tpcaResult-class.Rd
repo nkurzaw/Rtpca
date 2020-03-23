@@ -21,9 +21,9 @@ S4 TPCA Result Class
 
 \item{\code{ContrastList}}{list.}
 
-\item{\code{ctrlCondName}}{character.}
+\item{\code{CtrlCondName}}{character.}
 
-\item{\code{contrastCondName}}{character.}
+\item{\code{ContrastCondName}}{character.}
 
 \item{\code{DistMat}}{matrix.}
 

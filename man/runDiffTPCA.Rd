@@ -4,7 +4,8 @@
 \alias{runDiffTPCA}
 \title{Run differential TPCA analysis}
 \usage{
-runDiffTPCA(objList, contrastList, ppiAnno = NULL, rownameCol = NULL,
+runDiffTPCA(objList, contrastList, ctrlCondName = "control",
+  contrastCondName = "treatment", ppiAnno = NULL, rownameCol = NULL,
   summaryMethod = "median", distMethod = "euclidean", n = 10000,
   p_adj_method = "BH")
 }
@@ -16,6 +17,12 @@ or matrices or data frames}
 \item{contrastList}{input list of objects for
 comparison at e.g. different treatment condtion,
 same file formats work as for objList}
+
+\item{ctrlCondName}{character string indicating the name
+of the control condition, default is "control"}
+
+\item{contrastCondName}{character string indicating the name
+of the contrast condition, default is "treatment"}
 
 \item{ppiAnno}{data frame annotation known
 protein-protein interactions (PPI) to test}

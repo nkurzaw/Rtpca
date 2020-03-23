@@ -2,8 +2,8 @@
 #'
 #' @slot ObjList list.
 #' @slot ContrastList list.
-#' @slot ctrlCondName character.
-#' @slot contrastCondName character.
+#' @slot CtrlCondName character.
+#' @slot ContrastCondName character.
 #' @slot DistMat matrix.
 #' @slot ContrastDistMat matrix
 #' @slot CommonFeatures vector.
@@ -42,8 +42,8 @@ tpcaResult <- setClass("tpcaResult",
                       slots = list(
                           ObjList = "list",
                           ContrastList = "list",
-                          ctrlCondName = "character",
-                          contrastCondName = "character",
+                          CtrlCondName = "character",
+                          ContrastCondName = "character",
                           CommonFeatures = "vector",
                           DistMat = "matrix", #"DelayedMatrix",
                           ContrastDistMat = "matrix",
