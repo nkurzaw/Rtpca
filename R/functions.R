@@ -1068,29 +1068,71 @@ plotDiffTpcaVolcano <- function(tpcaObj,
     return(p)
 }
 
+plotPPiProfiles <- function(tpcaObj, pair, splines_df = 4){
+    plot_df <- .getDf4PlotProfiles(tpcaObj, pair)
+    ggplot(plot_df, aes(temperature, rel_value)) +
+        geom_point(aes(color = gene_name)) +
+        # geom_smooth(method = "lm", group = gene_name,
+        #             formula = y ~ splines::ns(x, df = splines_df)) +
+        facet_wrap(~condition) +
+        theme_bw()
+        
+}
 
-# plotPPiProfiles <- function(tpcaObj, pair){
-#     if(class(tpcaObj@ObjList[[1]])[1] == "ExpressionSet"){
-#         bind_rows(lapply(tpcaObj@ObjList, function(eset){
-#             sub_eset <- exprs(eset)[rownames(eset) %in% pair,]
-#             cond1_df <- sub_eset %>% 
-#                 tbl_df %>%
-#                 mutate(gene_name = rownames(sub_eset))
-#                 
-#         }))
-#     }else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
-#         lapply(tpcaObj@ObjList[1][[1]] %>%
-#             tbl_df %>%
-#             mutate(gene_name = rownames(tpcaObj@ObjList[1][[1]])) %>%
-#             filter(gene_name %in% c("PIK3R1", "CRK")) %>%
-#             gather(temperature, rel_value, -gene_name) %>%
-#             #mutate(temperature = as.numeric(gsub("Mock_", "", temperature))) %>%
-#             ggplot(aes(temperature, rel_value)) +
-#             geom_point(aes(color = gene_name)) +
-#             theme_bw()
-#     }else if((class(tpcaObj@ObjList[[1]])[1] %in% c("tbl_df")) &
-#              !is.null(rownameCol)){
-# 
-#     }
-#     cond1_df <- tpcaObj@objList
-# }
+.getDf4PlotProfiles <- function(tpcaObj, pair){
+    if(class(tpcaObj@ObjList[[1]])[1] == "ExpressionSet"){
+        full_cond_df <- bind_rows(lapply(tpcaObj@ObjList, function(eset){
+            sub_mat <- exprs(eset)[rownames(eset) %in% pair,]
+            sub_cond1_df <- .gatherSubMat(
+                sub_mat = sub_mat,
+                temperature_anno = eset$temperature
+            )
+        })) %>% mutate(condition = tpcaObj@CtrlCondName)
+        if(length(tpcaObj@ContrastList) != 0){
+            if(class(tpcaObj@ContrastList[[1]])[1] == "ExpressionSet"){
+                cond2_df <- bind_rows(lapply(tpcaObj@ContrastList, function(eset){
+                    sub_mat <- exprs(eset)[rownames(eset) %in% pair,]
+                    sub_cond2_df <- .gatherSubMat(
+                        sub_mat = sub_mat,
+                        temperature_anno = eset$temperature
+                    )
+                })) %>% mutate(condition = tpcaObj@ContrastCondName)
+                full_cond_df <- bind_rows(
+                    full_cond_df, cond2_df
+                )
+                return(full_cond_df) 
+            }else(stop("ObjList is of class 'ExpressionSet', 
+                       while ContrastList ist not!\n"))
+        }else{
+           return(full_cond_df) 
+        }
+    }
+    # else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
+    #     lapply(tpcaObj@ObjList[1][[1]] %>%
+    #                tbl_df %>%
+    #                mutate(gene_name = rownames(tpcaObj@ObjList[1][[1]])) %>%
+    #                filter(gene_name %in% c("PIK3R1", "CRK")) %>%
+    #                gather(temperature, rel_value, -gene_name) %>%
+    #                #mutate(temperature = as.numeric(gsub("Mock_", "", temperature))) %>%
+    #                ggplot(aes(temperature, rel_value)) +
+    #                geom_point(aes(color = gene_name)) +
+    #                theme_bw()
+    # }else if((class(tpcaObj@ObjList[[1]])[1] %in% c("tbl_df")) &
+    #          !is.null(rownameCol)){
+    #     
+    # }
+    # cond1_df <- tpcaObj@objList
+} 
+
+.gatherSubMat <- function(sub_mat, temperature_anno = NULL){
+    if(!is.null(temperature_anno)){
+        colnames(sub_mat) <- temperature_anno
+    }
+    cond_df <- sub_mat %>%
+        tbl_df %>%
+        mutate(gene_name = rownames(sub_mat)) %>%
+        gather(temperature, rel_value, -gene_name)
+    
+    return(cond_df)
+}
+
