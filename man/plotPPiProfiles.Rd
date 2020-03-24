@@ -4,7 +4,7 @@
 \alias{plotPPiProfiles}
 \title{Plot thermal profile of protein pairs}
 \usage{
-plotPPiProfiles(tpcaObj, pair, splines_df = 4)
+plotPPiProfiles(tpcaObj, pair)
 }
 \arguments{
 \item{tpcaObj}{a tpcaObj after having performed
