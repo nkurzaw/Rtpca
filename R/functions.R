@@ -750,13 +750,15 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .filterDistMat <- function(dist_mat, ppi_anno){
     mat_nrow <- length(which(rownames(dist_mat) %in% ppi_anno$x))
-    filt_mat <- dist_mat[rownames(dist_mat) %in% ppi_anno$x,
-                         colnames(dist_mat) %in% ppi_anno$y]
+    dist_row_names_in_ppi_anno <- rownames(dist_mat) %in% ppi_anno$x
+    dist_col_names_in_ppi_anno <- colnames(dist_mat) %in% ppi_anno$y
+    filt_mat <- dist_mat[dist_row_names_in_ppi_anno,
+                         dist_col_names_in_ppi_anno]
     filt_matrix <- matrix(filt_mat, nrow = mat_nrow)
     rownames(filt_matrix) <- rownames(dist_mat)[
-        rownames(dist_mat) %in% ppi_anno$x]
+        dist_row_names_in_ppi_anno]
     colnames(filt_matrix) <- colnames(dist_mat)[
-        colnames(dist_mat) %in% ppi_anno$y]
+        dist_col_names_in_ppi_anno]
     
     return(filt_matrix)
 }
