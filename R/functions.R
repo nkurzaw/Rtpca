@@ -1101,22 +1101,41 @@ plotPPiProfiles <- function(tpcaObj, pair, splines_df = 4){
                     full_cond_df, cond2_df
                 )
                 return(full_cond_df) 
-            }else(stop("ObjList is of class 'ExpressionSet', 
-                       while ContrastList ist not!\n"))
+            }else{
+                stop("ObjList is of class 'ExpressionSet', 
+                     while ContrastList ist not!\n")
+            }
         }else{
            return(full_cond_df) 
         }
     }
-    # else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
-    #     lapply(tpcaObj@ObjList[1][[1]] %>%
-    #                tbl_df %>%
-    #                mutate(gene_name = rownames(tpcaObj@ObjList[1][[1]])) %>%
-    #                filter(gene_name %in% c("PIK3R1", "CRK")) %>%
-    #                gather(temperature, rel_value, -gene_name) %>%
-    #                #mutate(temperature = as.numeric(gsub("Mock_", "", temperature))) %>%
-    #                ggplot(aes(temperature, rel_value)) +
-    #                geom_point(aes(color = gene_name)) +
-    #                theme_bw()
+    else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
+        full_cond_df <- bind_rows(lapply(tpcaObj@ObjList, function(mat){
+            sub_mat <- mat[rownames(mat) %in% pair,]
+            sub_cond1_df <- .gatherSubMat(
+                sub_mat = sub_mat,
+                temperature_anno = attributes(mat)$temperature
+            )
+        })) %>% mutate(condition = tpcaObj@CtrlCondName)
+        if(length(tpcaObj@ContrastList) != 0){
+            if(class(tpcaObj@ContrastList[[1]])[1] %in% c("matrix", "data.frame")){
+                cond2_df <- bind_rows(lapply(tpcaObj@ContrastList, function(mat){
+                    sub_mat <- mat[rownames(mat) %in% pair,]
+                    sub_cond2_df <- .gatherSubMat(
+                        sub_mat = sub_mat,
+                        temperature_anno = attributes(mat)$temperature
+                    )
+                })) %>% mutate(condition = tpcaObj@ContrastCondName)
+                full_cond_df <- bind_rows(
+                    full_cond_df, cond2_df
+                )
+                return(full_cond_df) 
+            }else{
+                stop("ObjList is of class 'matrix' or 'data.frame', 
+                     while ContrastList ist not!\n")
+            }
+        }
+    }
     # }else if((class(tpcaObj@ObjList[[1]])[1] %in% c("tbl_df")) &
     #          !is.null(rownameCol)){
     #     
