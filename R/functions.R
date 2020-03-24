@@ -1068,7 +1068,54 @@ plotDiffTpcaVolcano <- function(tpcaObj,
     return(p)
 }
 
-plotPPiProfiles <- function(tpcaObj, pair, splines_df = 4){
+#' Plot thermal profile of protein pairs
+#' 
+#' @param tpcaObj a tpcaObj after having performed
+#' a differential analysis, see \code{runDiffTPCA}
+#' @param pair character vector of one or more
+#' protein names
+#' 
+#' @return ggplot displaying the thermal profile 
+#' of a protein pair across conditions
+#' 
+#' @import ggplot2
+#' @import dplyr
+#' @export
+#' @examples 
+#' set.seed(12)
+#' m1 <- matrix(rnorm(50), ncol = 10)
+#' m2 <- matrix(rnorm(50), ncol = 10)
+#' 
+#' rownames(m1) <- letters[1:5]
+#' rownames(m2) <- letters[1:5]
+#' 
+#' colnames(m1) <- paste("fc", 1:10, sep = "_")
+#' colnames(m2) <- paste("fc", 1:10, sep = "_")
+#' 
+#' pheno <- data.frame(
+#'     temperature = seq(37, 67, length.out = 10))
+#' rownames(pheno) <- paste("fc", 1:10, sep = "_")
+#' 
+#' eset1 <- ExpressionSet(
+#'     assayData = m1,
+#'     phenoData = AnnotatedDataFrame(pheno)
+#' )
+#' 
+#' eset2 <- ExpressionSet(
+#'     assayData = m2,
+#'     phenoData = AnnotatedDataFrame(pheno)
+#' )
+#' 
+#' tpcaObj <- new("tpcaResult",
+#'                ObjList = list(eset1),
+#' 
+#'ContrastList = list(eset2),
+#'                 CtrlCondName = "control",
+#'                 ContrastCondName = "treatment")
+#' 
+#' plotPPiProfiles(tpcaObj, pair = c("b", "d"))
+#' 
+plotPPiProfiles <- function(tpcaObj, pair){
     plot_df <- .getDf4PlotProfiles(tpcaObj, pair)
     ggplot(plot_df, aes(temperature, rel_value)) +
         geom_point(aes(color = gene_name)) +
