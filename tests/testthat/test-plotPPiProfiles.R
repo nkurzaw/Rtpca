@@ -33,7 +33,7 @@ tpcaObj1 <- new("tpcaResult",
                 CtrlCondName = "control",
                 ContrastCondName = "treatment")
 
-p1 <- plotPPiProfiles(tpcaObj, pair = c("b", "d"))
+p1 <- plotPPiProfiles(tpcaObj1, pair = c("b", "d"))
 
 expect_equal(
     class(p1),
