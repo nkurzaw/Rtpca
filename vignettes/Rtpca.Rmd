@@ -73,16 +73,19 @@ trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data_fil)
 ```
 
 ```{r}
-data("ori_et_al_complex_ppis")
+data("string_ppi_df")
 ```
 
 ## Run TPCA on data from a single condition
 
 We can run TPCA for protein-protein interactions like this:
 ```{r}
+string_ppi_cs_950_df <- string_ppi_df %>% 
+    filter(combined_score >= 950 )
+
 vehTPCA <- runTPCA(
     objList = trData,
-    ppiAnno = ori_et_al_complex_ppis
+    ppiAnno = string_ppi_cs_950_df
 )
 ```
 Note: it is not necessary that your data has the format of the TPP package (ExpressionSet), you can also supply the function with a list of matrices of data frames (in the case of data frames you need to additionally indicate with column contains the protein or gene names).
@@ -120,13 +123,32 @@ diffTPCA <-
     runDiffTPCA(
         objList = trData[1:2], 
         contrastList = trData[3:4],
-        ppiAnno = ori_et_al_complex_ppis)
+        ppiAnno = string_ppi_cs_950_df)
 ```
 
 We can then plot a volcano plot to visualize the results:
 ```{r}
-plotDiffTpcaVolcano(diffTPCA)
+plotDiffTpcaVolcano(
+    diffTPCA,
+    setXLim = TRUE,
+    xlimit = c(-0.5, 0.5))
 ```
+
+The underlying result table can be inspected like this;
+```{r}
+head(diffTPCA@diffTpcaResultTable %>% 
+         arrange(p_value) %>% 
+        dplyr::select(pair, rssC1_rssC2, f_stat, p_value, p_adj))
+```
+
+We can see that none of these interactions is significant consiering the multiple comparison we have done. Yet, we can look at the melting curves of pairs like the "KPNA6:KPNB1" by evoking:
+
+```{r}
+plotPPiProfiles(diffTPCA, pair = c("KPNA6", "KPNB1"))
+```
+We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.       
+This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.      
+
 
 As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
 
