@@ -1079,13 +1079,14 @@ plotDiffTpcaVolcano <- function(tpcaObj,
                                 setXLim  = FALSE, 
                                 xlimit = c(-0.75, 0.75)){
     plot_df <- tpcaObj@diffTpcaResultTable
-    
+    controlCond <- tpcaObj@CtrlCondName
+    constrastCond <- tpcaObj@ContrastCondName
     p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(valueC2), -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
-        labs(x = expression(sqrt(italic(d)[tpcaObj@CtrlCondName])~ ' - ' 
-                            ~sqrt(italic(d)[tpcaObj@ContrastCondName])),
+        labs(x = bquote(sqrt(italic(d)[.(controlCond)])~ ' - ' 
+                            ~sqrt(italic(d)[.(constrastCond)])),
              y = expression('-log'[10]*'('*italic(p)*' value)'))
     
     if(setXLim){
