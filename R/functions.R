@@ -349,6 +349,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 #' @import dplyr
+#' @importFrom stats p.adjust
+#' @importFrom fdrtool fdrtool
 .computeDistPValue <- function(tpcaDf, backgList, 
                                p_adj_method = "BH"){
     tpcaDf <- tpcaDf %>% 
@@ -358,8 +360,15 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
                                           mean_dist))/
                    length(backgList[[as.character(count)]])) %>% 
         ungroup %>% 
-        within(p_value[p_value == 0] <- .Machine$double.eps) %>% 
-        mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+        within(p_value[p_value == 0] <- .Machine$double.eps)
+    if(p_adj_method %in% c("BH", "bonferroni")){
+        tpcaDf <- tpcaDf %>% 
+            mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+    }else if(p_adj_method == "fdrtool"){
+        tpcaDf <- tpcaDf %>% 
+            mutate(l_fdr = fdrtool(tpcaDf$p_value, 
+                                   statistic = "pvalue")$lfdr)
+    }
     
     return(tpcaDf)
 }
@@ -855,6 +864,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     return(comboRandDf)
 }
 
+#' @importFrom stats p.adjust
+#' @importFrom fdrtool fdrtool
 .computeEmpiricalPValue <- function(
     combo_df, combo_rand_df, p_adj_method = "BH"){
     
@@ -864,8 +875,15 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         mutate(p_value = length(which(combo_rand_df$f_stat >= f_stat))/
                    nrow(combo_rand_df)) %>% 
         ungroup %>% 
-        within(p_value[p_value == 0] <- .Machine$double.eps) %>% 
-        mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+        within(p_value[p_value == 0] <- .Machine$double.eps)
+    if(p_adj_method %in% c("BH", "bonferroni")){
+        empirical_p_df <- empirical_p_df %>% 
+            mutate(p_adj = p.adjust(p_value, method = p_adj_method))
+    }else if(p_adj_method == "fdrtool"){
+        empirical_p_df <- empirical_p_df %>% 
+            mutate(l_fdr = fdrtool(empirical_p_df$p_value, 
+                                   statistic = "pvalue")$lfdr)
+    }
     
     return(empirical_p_df)
 }
@@ -950,6 +968,7 @@ runDiffTPCA <- function(objList,
                         ctrlCondName = "control",
                         contrastCondName = "treatment",
                         ppiAnno = NULL,
+                        complexAnno = NULL,
                         rownameCol = NULL,
                         summaryMethod = "median",
                         distMethod = "euclidean",
@@ -961,7 +980,7 @@ runDiffTPCA <- function(objList,
         contrastList = contrastList,
         ctrlCondName = ctrlCondName,
         contrastCondName = contrastCondName,
-        complexAnno = NULL,
+        complexAnno = complexAnno,
         ppiAnno = ppiAnno
     )
     message("Creating distance matrices. \n")
@@ -971,16 +990,20 @@ runDiffTPCA <- function(objList,
         summaryMethod = summaryMethod,
         distMethod = distMethod
     )
-    message("Comparing annotated protein-pairs across conditions. \n")
-    combo_df <- .compareConditions(
-        tpcaObj = tpcaObj, 
-        prot_pairs = ppiAnno
-    )
-    message("Comparing random protein-pairs across conditions. \n")
-    combo_rand_df <- .compareConditionsRandom(
-        tpcaObj = tpcaObj, 
-        n = n
-    )
+    if(!is.null(ppiAnno)){
+        message("Comparing annotated protein-pairs across conditions. \n")
+        combo_df <- .compareConditions(
+            tpcaObj = tpcaObj, 
+            prot_pairs = ppiAnno
+        )
+        message("Comparing random protein-pairs across conditions. \n")
+        combo_rand_df <- .compareConditionsRandom(
+            tpcaObj = tpcaObj, 
+            n = n
+        )
+    }else if(!is.null(complexAnno)){
+        NULL
+    }
     message("Generating result table. \n")
     tpcaObj@diffTpcaResultTable <- .computeEmpiricalPValue(
         combo_df, 
@@ -1194,7 +1217,7 @@ plotPPiProfiles <- function(tpcaObj, pair){
 
 .gatherSubMat <- function(sub_mat, temperature_anno = NULL){
     if(!is.null(temperature_anno)){
-        colnames(sub_mat) <- temperature_anno
+        colnames(sub_mat) <- as.character(temperature_anno)
     }
     cond_df <- sub_mat %>%
         tbl_df %>%

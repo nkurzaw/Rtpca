@@ -15,5 +15,5 @@ LazyData: false
 biocViews: Software, Proteomics, DataImport
 Depends: R (>= 3.6.0), stats, utils, Biobase, dplyr, tidyr
 Imports: methods, ggplot2, pROC
-Suggests: knitr, BiocStyle, TPP, testthat
+Suggests: knitr, BiocStyle, TPP, testthat, fdrtool
 RoxygenNote: 6.1.1
