@@ -364,7 +364,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     if(p_adj_method %in% c("BH", "bonferroni")){
         tpcaDf <- tpcaDf %>% 
             mutate(p_adj = p.adjust(p_value, method = p_adj_method))
-    }else if(p_adj_method == "fdrtool"){
+    }else if(p_adj_method %in% c("fdrtool")){
         tpcaDf <- tpcaDf %>% 
             mutate(l_fdr = fdrtool(tpcaDf$p_value, 
                                    statistic = "pvalue")$lfdr)
@@ -879,7 +879,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     if(p_adj_method %in% c("BH", "bonferroni")){
         empirical_p_df <- empirical_p_df %>% 
             mutate(p_adj = p.adjust(p_value, method = p_adj_method))
-    }else if(p_adj_method == "fdrtool"){
+    }else if(p_adj_method %in% "fdrtool"){
         empirical_p_df <- empirical_p_df %>% 
             mutate(l_fdr = fdrtool(empirical_p_df$p_value, 
                                    statistic = "pvalue")$lfdr)
