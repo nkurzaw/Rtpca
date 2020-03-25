@@ -902,6 +902,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' of the contrast condition, default is "treatment"
 #' @param ppiAnno data frame annotation known
 #' protein-protein interactions (PPI) to test 
+#' @param complexAnno data frame annotating
+#' known protein complexes of interest to test 
 #' @param rownameCol in case the input objects are tibbles
 #' this parameter takes in the name (character) of the column 
 #' specifying protein names or ids

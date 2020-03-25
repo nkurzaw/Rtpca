@@ -27,6 +27,9 @@ of the contrast condition, default is "treatment"}
 \item{ppiAnno}{data frame annotation known
 protein-protein interactions (PPI) to test}
 
+\item{complexAnno}{data frame annotating
+known protein complexes of interest to test}
+
 \item{rownameCol}{in case the input objects are tibbles
 this parameter takes in the name (character) of the column 
 specifying protein names or ids}
