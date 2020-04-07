@@ -351,6 +351,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @import dplyr
 #' @importFrom stats p.adjust
 #' @importFrom fdrtool fdrtool
+#' @importFrom stats na.omit
 .computeDistPValue <- function(tpcaDf, backgList, 
                                p_adj_method = "BH"){
     tpcaDf <- tpcaDf %>% 
@@ -683,6 +684,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     
 }
 
+#' @importFrom utils head
+#' @importFrom utils tail
 .simpleAuc <- function(x, y){
     sum(diff(x) * (head(y,-1)+tail(y,-1)))/2
 }
@@ -866,6 +869,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 
 #' @importFrom stats p.adjust
 #' @importFrom fdrtool fdrtool
+#' @importFrom stats na.omit
 .computeEmpiricalPValue <- function(
     combo_df, combo_rand_df, p_adj_method = "BH"){
     
@@ -1102,12 +1106,15 @@ plotDiffTpcaVolcano <- function(tpcaObj,
 #' a differential analysis, see \code{runDiffTPCA}
 #' @param pair character vector of one or more
 #' protein names
+#' @param splinesDf numeric, degree of freedom of 
+#' the spline fit to the melting curves
 #' 
 #' @return ggplot displaying the thermal profile 
 #' of a protein pair across conditions
 #' 
 #' @import ggplot2
 #' @import dplyr
+#' @importFrom splines ns
 #' @export
 #' @examples 
 #' set.seed(12)
@@ -1143,13 +1150,17 @@ plotDiffTpcaVolcano <- function(tpcaObj,
 #' 
 #' plotPPiProfiles(tpcaObj, pair = c("b", "d"))
 #' 
-plotPPiProfiles <- function(tpcaObj, pair){
+plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
     plot_df <- .getDf4PlotProfiles(tpcaObj, pair)
     ggplot(plot_df, aes(temperature, rel_value)) +
         geom_point(aes(color = gene_name)) +
-        # geom_smooth(method = "lm", group = gene_name,
-        #             formula = y ~ splines::ns(x, df = splines_df)) +
+        geom_smooth(method = "lm", 
+                    aes(group = gene_name, color = gene_name),
+                    formula = y ~ splines::ns(x, df = splinesDf),
+                    se = FALSE, size = 0.5) +
         facet_wrap(~condition) +
+        scale_color_brewer("protein", palette = "Set1") +
+        labs(y = "fraction non-denatured") +
         theme_bw()
         
 }

@@ -4,7 +4,7 @@
 \alias{plotPPiProfiles}
 \title{Plot thermal profile of protein pairs}
 \usage{
-plotPPiProfiles(tpcaObj, pair)
+plotPPiProfiles(tpcaObj, pair, splinesDf = 4)
 }
 \arguments{
 \item{tpcaObj}{a tpcaObj after having performed
@@ -12,6 +12,9 @@ a differential analysis, see \code{runDiffTPCA}}
 
 \item{pair}{character vector of one or more
 protein names}
+
+\item{splinesDf}{numeric, degree of freedom of 
+the spline fit to the melting curves}
 }
 \value{
 ggplot displaying the thermal profile 
