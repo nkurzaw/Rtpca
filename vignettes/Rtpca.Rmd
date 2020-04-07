@@ -7,10 +7,7 @@ author:
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 package: Rtpca
 output:
-  BiocStyle::html_document:
-    keep_md: yes
-  BiocStyle::pdf_document: 
-    default
+  BiocStyle::html_document 
 vignette: >
     %\VignetteIndexEntry{Introduction to Rtpca}
     %\VignetteEngine{knitr::rmarkdown}
@@ -41,7 +38,7 @@ library(Rtpca)
 
 # Introduction
 
-The `Rtpca` package contains functions to analyze thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] experiments in the light of protein-protein interactions (PPIs). It makes use of a method termed thermal proximity coaggregation analysis (TPCA) [@Tan2018] and also allows to test for changes in PPIs across different conditions.
+Thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] is a mass spectrometry-based, proteome-wide implemention of the cellular thermal shift assay [@Molina2013]. It was originally developed to study drug-(off-)target engagement. However, it was realized that profiles of interacting protein pairs appeared more similar than by chance which was coined as 'thermal proximity co-aggregation' (TPCA) [@Tan2018]. The R package `Rtpca` enables analysis of TPP datasets using the TPCA concept for studying protein-protein interactions and protein complexes and also allows to test for differential protein-protein interactions across different conditions.         
 
 This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
 
