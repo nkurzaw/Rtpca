@@ -123,6 +123,8 @@ diffTPCA <-
     runDiffTPCA(
         objList = trData[1:2], 
         contrastList = trData[3:4],
+        ctrlCondName = "DMSO",
+        contrastCondName = "Panobinostat",
         ppiAnno = string_ppi_cs_950_df)
 ```
 
