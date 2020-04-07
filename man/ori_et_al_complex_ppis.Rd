@@ -5,7 +5,8 @@
 \alias{ori_et_al_complex_ppis}
 \title{Data frame of eukaryotic protein-protein
 interactions inferred from annotated protein 
-complexes by Ori et al.}
+complexes by Ori et al. and StringDB interations
+with a combined score of at least 900}
 \format{data frame with columns complex_name, x, y, 
 pair (unique pair id)}
 \usage{
@@ -19,6 +20,8 @@ interacting proteins within protein complexes
 data("ori_et_al_complex_ppis")
 }
 \references{
-Ori et al. (2016), Genome Biology, 17, 47
+Ori et al. (2016), Genome Biology, 17, 47;
+Jensen et al. (2009), Nucleic Acids Research, 
+37, D412–D416
 }
 \keyword{datasets}
