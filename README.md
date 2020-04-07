@@ -184,4 +184,4 @@ thermal profiling of the proteome. Science *346, 6205*, 1255784.
 Tan, C.S.H., Go, K.D., Bisteau, X., Dai, L., Yong, C.H., Prabhu, N.,
 Ozturk, M.B., Lim, Y.T., Sreekumar, L., Lengqvist, J., et al. (2018).
 Thermal proximity coaggregation for system-wide profiling of protein
-complex dynamics in cells. Science *346, 6380*, 1170–1177.
+complex dynamics in cells. Science *359, 6380*, 1170–1177.
