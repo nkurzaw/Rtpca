@@ -40,7 +40,7 @@ library(Rtpca)
 
 Thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] is a mass spectrometry-based, proteome-wide implemention of the cellular thermal shift assay [@Molina2013]. It was originally developed to study drug-(off-)target engagement. However, it was realized that profiles of interacting protein pairs appeared more similar than by chance which was coined as 'thermal proximity co-aggregation' (TPCA) [@Tan2018]. The R package `Rtpca` enables analysis of TPP datasets using the TPCA concept for studying protein-protein interactions and protein complexes and also allows to test for differential protein-protein interactions across different conditions.         
 
-This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
+This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
 We also load the `TPP` package to illustrate how to import TPP data with the Bioconductor package and then input in into the `Rtpca` functions.
 ```{r, message=FALSE, warning=FALSE}
@@ -149,7 +149,7 @@ We can see that both protein do seem to coaggregate, but that the mild differenc
 This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.      
 
 
-As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
+As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
 ```{r}
 sessionInfo()
