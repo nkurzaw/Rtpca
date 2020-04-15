@@ -1236,7 +1236,8 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
     cond_df <- sub_mat %>%
         tbl_df %>%
         mutate(gene_name = rownames(sub_mat)) %>%
-        gather(temperature, rel_value, -gene_name)
+        gather(temperature, rel_value, -gene_name) %>% 
+        mutate(temperature = as.numeric(temperature))
     
     return(cond_df)
 }
