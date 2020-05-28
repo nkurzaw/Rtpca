@@ -309,10 +309,10 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .sampleBackgroundDistribution <- function(distMat, nMem = 3, nSamp = 10000){
     nCol <- ncol(distMat)
-    samplesOfN <- sapply(seq_len(nSamp), function(i){
+    samplesOfN <- vapply(seq_len(nSamp), function(i){
         ids <- sample(seq_len(nCol), size = nMem, replace = FALSE)
         mean(distMat[ids, ids][upper.tri(matrix(0, ncol = nMem, nrow = nMem))])
-    })
+    }, FUN.VALUE = 1.0)
     return(samplesOfN)
 }
 
@@ -742,7 +742,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .checkMatDims <- function(matList){
     dim_list <- lapply(matList, dim)
-    if(!all(sapply(dim_list, identical, dim_list[[1]]))){
+    if(!all(vapply(dim_list, identical, dim_list[[1]]), 
+            FUN.VALUE = FALSE)){
         stop("checkMatDims: unequal matrix dimensions!")
     }
 }
