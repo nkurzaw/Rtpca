@@ -742,8 +742,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .checkMatDims <- function(matList){
     dim_list <- lapply(matList, dim)
-    if(!all(vapply(dim_list, identical, dim_list[[1]]), 
-            FUN.VALUE = FALSE)){
+    if(!all(vapply(dim_list, identical, dim_list[[1]], 
+            FUN.VALUE = TRUE))){
         stop("checkMatDims: unequal matrix dimensions!")
     }
 }
