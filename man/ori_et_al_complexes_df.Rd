@@ -5,8 +5,10 @@
 \alias{ori_et_al_complexes_df}
 \title{Data frame of annotated protein complexes by Ori 
 et al.}
-\format{data frame with columns ensembl_id, protein
-and id (complex identifier)}
+\format{
+data frame with columns ensembl_id, protein
+and id (complex identifier)
+}
 \usage{
 data("ori_et_al_complexes_df")
 }

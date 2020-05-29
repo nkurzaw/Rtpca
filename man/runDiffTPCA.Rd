@@ -4,10 +4,19 @@
 \alias{runDiffTPCA}
 \title{Run differential TPCA analysis}
 \usage{
-runDiffTPCA(objList, contrastList, ctrlCondName = "control",
-  contrastCondName = "treatment", ppiAnno = NULL, complexAnno = NULL,
-  rownameCol = NULL, summaryMethod = "median",
-  distMethod = "euclidean", n = 10000, p_adj_method = "BH")
+runDiffTPCA(
+  objList,
+  contrastList,
+  ctrlCondName = "control",
+  contrastCondName = "treatment",
+  ppiAnno = NULL,
+  complexAnno = NULL,
+  rownameCol = NULL,
+  summaryMethod = "median",
+  distMethod = "euclidean",
+  n = 10000,
+  p_adj_method = "BH"
+)
 }
 \arguments{
 \item{objList}{input list of objects, e.g.

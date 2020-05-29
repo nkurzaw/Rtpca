@@ -5,8 +5,12 @@
 \title{Create distance matrix of all vs all protein 
 melting profiles}
 \usage{
-createDistMat(objList, rownameCol = NULL, summaryMethod = "median",
-  distMethod = "euclidean")
+createDistMat(
+  objList,
+  rownameCol = NULL,
+  summaryMethod = "median",
+  distMethod = "euclidean"
+)
 }
 \arguments{
 \item{objList}{list of objects suitable for the analysis,

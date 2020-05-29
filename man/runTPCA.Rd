@@ -4,10 +4,18 @@
 \alias{runTPCA}
 \title{Run the TPCA analysis}
 \usage{
-runTPCA(objList, complexAnno = NULL, ppiAnno = NULL,
-  rownameCol = NULL, summaryMethod = "median",
-  distMethod = "euclidean", doRocAnalysis = TRUE, minCount = 3,
-  nSamp = 10000, p_adj_method = "BH")
+runTPCA(
+  objList,
+  complexAnno = NULL,
+  ppiAnno = NULL,
+  rownameCol = NULL,
+  summaryMethod = "median",
+  distMethod = "euclidean",
+  doRocAnalysis = TRUE,
+  minCount = 3,
+  nSamp = 10000,
+  p_adj_method = "BH"
+)
 }
 \arguments{
 \item{objList}{inout list of objects, e.g.

@@ -4,8 +4,12 @@
 \alias{plotDiffTpcaVolcano}
 \title{Plot differential TPCA analysis results}
 \usage{
-plotDiffTpcaVolcano(tpcaObj, alpha = 0.1, setXLim = FALSE,
-  xlimit = c(-0.75, 0.75))
+plotDiffTpcaVolcano(
+  tpcaObj,
+  alpha = 0.1,
+  setXLim = FALSE,
+  xlimit = c(-0.75, 0.75)
+)
 }
 \arguments{
 \item{tpcaObj}{a tpcaObj after having performed

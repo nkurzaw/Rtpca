@@ -6,8 +6,10 @@
 \title{Data frame of annotated human protein-protein
 interactions retrieved from stringDB with a combined
 interaciton score euqal or higher than 700}
-\format{data frame with columns x, y (gene symbol of 
-interactors), combined_score, pair (unique pair id)}
+\format{
+data frame with columns x, y (gene symbol of 
+interactors), combined_score, pair (unique pair id)
+}
 \usage{
 data("string_ppi_df")
 }

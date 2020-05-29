@@ -7,8 +7,10 @@
 interactions inferred from annotated protein 
 complexes by Ori et al. and StringDB interations
 with a combined score of at least 900}
-\format{data frame with columns complex_name, x, y, 
-pair (unique pair id)}
+\format{
+data frame with columns complex_name, x, y, 
+pair (unique pair id)
+}
 \usage{
 data("ori_et_al_complex_ppis")
 }

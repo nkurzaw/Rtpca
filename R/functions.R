@@ -214,6 +214,8 @@ createDistMat <- function(objList, rownameCol = NULL,
 #' plotPPiRoc(tpcaTest)
 #' 
 plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
+    FPR <- TPR <- x <- y <- label <- NULL
+    
     rocTab <- tpcaObj@PPiRocTable
     if(computeAUC){
         rocTabAnno <- tpcaObj@PPiRocTableAnno
@@ -542,26 +544,10 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
                FPR = cumsum(as.numeric(annotated == FALSE)) / 
                    (n() - cumsum(as.numeric(value != 0)) +  
                         cumsum(as.numeric(annotated == FALSE))))
-    # chunDimsMat <- c(ifelse(nrow(distDf) < 500,
-    #                         nrow(distDf), 500), 3)
-    # chunDimsAnno <- c(ifelse(nrow(distDf) < 500, 
-    #                          nrow(distDf), 500), 2)
-    # rocMat <- as.matrix(
-    #     distDf %>% dplyr::select(TPR, FPR, value))
-    # tpcaObj@PPiRocTable <- writeHDF5Array(
-    #     x = rocMat, chunkdim = chunDimsMat)
     tpcaObj@PPiRocTable <- distDf %>% 
         dplyr::select(TPR, FPR, eucl_dist = value)
-    # colnames(tpcaObj@PPiRocTable) <- 
-    #     c("TPR", "FPR", "eucl_dist")
-    # annoDf <- as.data.frame(
-    #     dplyr::select(distDf, pair, annotated))
-    # tpcaObj@PPiRocTableAnno <- writeHDF5Array(
-    #     x = annoDf, chunkdim = chunDimsAnno)
     tpcaObj@PPiRocTableAnno <- distDf %>% 
         dplyr::select(pair, annotated)
-    # colnames(tpcaObj@PPiRocTableAnno) <- 
-    #     c("pair", "annotated")
     return(tpcaObj)
 }
 

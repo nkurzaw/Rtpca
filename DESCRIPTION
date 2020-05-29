@@ -16,4 +16,4 @@ biocViews: Software, Proteomics, DataImport
 Depends: R (>= 3.6.0), stats, utils, Biobase, dplyr, tidyr
 Imports: methods, ggplot2, pROC, fdrtool, splines
 Suggests: knitr, BiocStyle, TPP, testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
