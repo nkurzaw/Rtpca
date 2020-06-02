@@ -648,6 +648,8 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 #' plotComplexRoc(tpcaTest)
 #' 
 plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
+    FPR <- TPR <- x <- y <- label <- NULL
+    
     rocTab <- tpcaObj@ComplexRocTable
     if(computeAUC){
         aucText <- paste0("AUC = ", as.character(
@@ -1069,6 +1071,8 @@ plotDiffTpcaVolcano <- function(tpcaObj,
                                 alpha = 0.1,
                                 setXLim  = FALSE, 
                                 xlimit = c(-0.75, 0.75)){
+    valueC1 <- valueC2 <- p_value <- p_adj <- NULL
+    
     plot_df <- tpcaObj@diffTpcaResultTable
     controlCond <- tpcaObj@CtrlCondName
     constrastCond <- tpcaObj@ContrastCondName
