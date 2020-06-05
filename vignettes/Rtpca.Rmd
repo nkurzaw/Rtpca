@@ -135,7 +135,7 @@ plotDiffTpcaVolcano(
 
 The underlying result table can be inspected like this;
 ```{r}
-head(diffTPCA@diffTpcaResultTable %>% 
+head(diffTpcaResultTable(diffTPCA) %>% 
          arrange(p_value) %>% 
         dplyr::select(pair, rssC1_rssC2, f_stat, p_value, p_adj))
 ```
