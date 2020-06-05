@@ -21,7 +21,15 @@
 #' @return an object of class tpcaResult
 #' with the following slots:
 #' 1) ObjList: containing the supplied list of
-#' objects
+#' objects (e.g. a list of Expression Sets 
+#' summarizing a TPP experiment)
+#' 2) ContrastList: containing the supplied list 
+#' of constrast objects (if supplied for
+#' performance of a differential Rtpca analysis)
+#' 3) CtrlCondName:
+#' 4) ContrastCondName:
+#' 5) DistMat:
+#' 6) ContrastDistMat:
 #'
 #' @export
 #'
@@ -62,7 +70,6 @@ tpcaResult <- setClass("tpcaResult",
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Show
 ###
-
 setMethod("show", "tpcaResult",
           function(object)
           {
@@ -77,13 +84,7 @@ setMethod("show", "tpcaResult",
                   "and length", length(object@ContrastList),"\n")
               
               cat('Slot "DistMat" with dimension:', dim(object@DistMat), "\n") 
-              # cat('head(DistMat):', "\n")
-              # max_col <- ifelse(ncol(object@DistMat) < 5, ncol(object@DistMat), 5)
-              # max_row <- ifelse(nrow(object@DistMat) < 5, nrow(object@DistMat), 5)
-              # for(i in seq_len(max_row)){
-              #     cat(object@DistMat[i, 1:max_col], "\n")
-              # }
-              
+
               cat('Slot "ContrastDistMat" with dimension:', dim(object@ContrastDistMat), "\n") 
               
               cat('Slot "ComplexAnnotation" of class:', class(object@ComplexAnnotation), 
@@ -115,3 +116,64 @@ setMethod("show", "tpcaResult",
               cat('Slot "diffTpcaResultTable" of class:', class(object@diffTpcaResultTable), 
                   'with dim:', dim(object@diffTpcaResultTable), "\n")
           })
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Generics
+###
+
+#### Get tpcaResultTable
+setGeneric("tpcaResultTable", function(object)
+    standardGeneric("tpcaResultTable"))
+
+#' Extract tpcaResultTable
+#' @aliases tpcaResultTable
+#' @param object and object of class tpcaResult
+#' @return a data frame containing the results
+#' from a tpca analysis
+#' @export
+#' @examples
+#' m1 <- matrix(1:12, ncol = 4)
+#' m2 <- matrix(2:13, ncol = 4)
+#' m3 <- matrix(c(2:10, 1:7), ncol = 4)
+#' 
+#'rownames(m1) <- 1:3
+#' rownames(m2) <- 2:4
+#' rownames(m3) <- 2:5
+#' 
+#' mat_list <- list(
+#'     m1, m2, m3
+#' )
+#' tpcaObj <- new("tpcaResult", ObjList = mat_list)
+#' tpcaResultTable(tpcaObj)
+setMethod("tpcaResultTable", "tpcaResult", function(object){
+    object@tpcaResultTable
+})
+
+#### Get diffTpcaResultTable
+setGeneric("diffTpcaResultTable", function(object)
+    standardGeneric("diffTpcaResultTable"))
+
+#' Extract diffTpcaResultTable
+#' @aliases diffTpcaResultTable
+#' @param object and object of class tpcaResult
+#' @return a data frame containing the results
+#' from a diffTpca analysis
+#' @export
+#' @examples 
+#' m1 <- matrix(1:12, ncol = 4)
+#' m2 <- matrix(2:13, ncol = 4)
+#' m3 <- matrix(c(2:10, 1:7), ncol = 4)
+#' 
+#'rownames(m1) <- 1:3
+#' rownames(m2) <- 2:4
+#' rownames(m3) <- 2:5
+#' 
+#' mat_list <- list(
+#'     m1, m2, m3
+#' )
+#' tpcaObj <- new("tpcaResult", ObjList = mat_list)
+#' diffTpcaResultTable(tpcaObj)
+setMethod("diffTpcaResultTable", "tpcaResult", function(object){
+    object@diffTpcaResultTable
+})
+

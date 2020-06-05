@@ -9,7 +9,12 @@
 an object of class tpcaResult
 with the following slots:
 1) ObjList: containing the supplied list of
-objects
+objects (e.g. a list of Expression Sets 
+summarizing a TPP experiment)
+2) ContrastList: containing the supplied list 
+of constrast objects (if supplied for
+performance of a differential Rtpca analysis)
+3)
 }
 \description{
 S4 TPCA Result Class
