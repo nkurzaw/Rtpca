@@ -206,12 +206,6 @@ vehTPCA <- runTPCA(
 ## Performing PPi ROC analysis.
 ```
 
-```
-## Warning: `tbl_df()` is deprecated as of dplyr 1.0.0.
-## Please use `tibble::as_tibble()` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.
-```
 Note: it is not necessary that your data has the format of the TPP package (ExpressionSet), you can also supply the function with a list of matrices of data frames (in the case of data frames you need to additionally indicate with column contains the protein or gene names).
 
 We can also run TPCA to test for coaggregation of protein complexes like this:
@@ -255,7 +249,6 @@ plotPPiRoc(vehTPCA, computeAUC = TRUE)
 ## Warning: Removed 2065 row(s) containing missing values (geom_path).
 ```
 
-![](/private/var/folders/6d/gcsvgy050tqfzr5k12vcf7vm0000gq/T/RtmprrLV9e/preview-11b80661ad3e1.dir/Rtpca_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 And we can also plot a ROC curve for how well our data captures protein complexes:
 
@@ -263,8 +256,6 @@ And we can also plot a ROC curve for how well our data captures protein complexe
 ```r
 plotComplexRoc(vehComplexTPCA, computeAUC = TRUE)
 ```
-
-![](/private/var/folders/6d/gcsvgy050tqfzr5k12vcf7vm0000gq/T/RtmprrLV9e/preview-11b80661ad3e1.dir/Rtpca_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 
 ## Run differential TPCA on two conditions 
@@ -311,7 +302,6 @@ plotDiffTpcaVolcano(
     xlimit = c(-0.5, 0.5))
 ```
 
-![](/private/var/folders/6d/gcsvgy050tqfzr5k12vcf7vm0000gq/T/RtmprrLV9e/preview-11b80661ad3e1.dir/Rtpca_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 The underlying result table can be inspected like this;
 
@@ -340,7 +330,6 @@ We can see that none of these interactions is significant consiering the multipl
 plotPPiProfiles(diffTPCA, pair = c("KPNA6", "KPNB1"))
 ```
 
-![](/private/var/folders/6d/gcsvgy050tqfzr5k12vcf7vm0000gq/T/RtmprrLV9e/preview-11b80661ad3e1.dir/Rtpca_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.       
 This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.      
 
