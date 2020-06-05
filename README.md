@@ -28,7 +28,7 @@ protein-protein interactions and protein complexes and also allows to
 test for differential protein-protein interactions across different
 conditions.
 
-This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Hashimoto_et_al_analysis.pdf).
+This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
 We also load the `TPP` package to illustrate how to import TPP data with the Bioconductor package and then input in into the `Rtpca` functions.
 ```{r, message=FALSE, warning=FALSE}
