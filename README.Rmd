@@ -1,0 +1,186 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-"
+  # out.width = "100%"
+)
+```
+# Rtpca
+
+<!-- badges: start -->
+[![Build Status](https://travis-ci.org/nkurzaw/Rtpca.svg?branch=master)](https://travis-ci.org/nkurzaw/Rtpca) [![codecov](https://codecov.io/gh/nkurzaw/Rtpca/branch/master/graph/badge.svg)](https://codecov.io/gh/nkurzaw/Rtpca)
+<!-- badges: end -->
+
+
+> Differential thermal co-aggregation analysis of TPP datasets using R
+
+# Installation
+
+Install the development version of the package from Github.
+
+```{r eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("nkurzaw/Rtpca"")
+```
+
+
+2. Load the package into your R session.
+```{r}
+library(Rtpca)
+```
+
+# Introduction
+
+Thermal proteome profiling (TPP) (Savitski et al. 2014; Mateus et al. 2020) is a mass spectrometry-based, proteome-wide implemention of the cellular thermal shift assay (Molina et al. 2013). It was originally developed to study drug-(off-)target engagement. However, it was realized that profiles of interacting protein pairs appeared more similar than by chance which was coined as 'thermal proximity co-aggregation' (TPCA) (Tan et al. 2018). The R package `Rtpca` enables analysis of TPP datasets using the TPCA concept for studying protein-protein interactions and protein complexes and also allows to test for differential protein-protein interactions across different conditions.         
+
+This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
+
+We also load the `TPP` package to illustrate how to import TPP data with the Bioconductor package and then input in into the `Rtpca` functions.
+
+```{r}
+library(TPP)
+```
+
+## Import Thermal proteome profiling data using the TPP package
+
+```{r}
+data("hdacTR_smallExample")
+```
+
+Filter hdacTR_data to speed up computations
+
+```{r}
+set.seed(123)
+random_proteins <- sample(hdacTR_data[[1]]$gene_name, 300)
+```
+
+
+```{r}
+hdacTR_data_fil <- lapply(hdacTR_data, function(temp_df){
+    filter(temp_df, gene_name %in% random_proteins)
+})
+```
+
+We can now import our small example dataset using the import function from the `TPP` package:
+
+```{r}
+trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data_fil)
+```
+
+```{r}
+data("string_ppi_df")
+```
+
+## Run TPCA on data from a single condition
+
+We can run TPCA for protein-protein interactions like this:
+```{r}
+string_ppi_cs_950_df <- string_ppi_df %>% 
+    filter(combined_score >= 950 )
+
+vehTPCA <- runTPCA(
+    objList = trData,
+    ppiAnno = string_ppi_cs_950_df
+)
+```
+Note: it is not necessary that your data has the format of the TPP package (ExpressionSet), you can also supply the function with a list of matrices of data frames (in the case of data frames you need to additionally indicate with column contains the protein or gene names).
+
+We can also run TPCA to test for coaggregation of protein complexes like this:
+```{r}
+data("ori_et_al_complexes_df")
+
+vehComplexTPCA <- runTPCA(
+    objList = trData,
+    complexAnno = ori_et_al_complexes_df,
+    minCount = 2
+)
+```
+
+We can plot a ROC curve for how well our data captures protein-protein interactions:
+```{r}
+plotPPiRoc(vehTPCA, computeAUC = TRUE)
+```
+
+And we can also plot a ROC curve for how well our data captures protein complexes:
+
+```{r}
+plotComplexRoc(vehComplexTPCA, computeAUC = TRUE)
+
+```
+
+
+## Run differential TPCA on two conditions 
+
+In order to test for protein-protein interactions that change significantly between both conditions, we can run the `runDiffTPCA` as illustrated below:
+
+```{r}
+diffTPCA <- 
+    runDiffTPCA(
+        objList = trData[1:2], 
+        contrastList = trData[3:4],
+        ctrlCondName = "DMSO",
+        contrastCondName = "Panobinostat",
+        ppiAnno = string_ppi_cs_950_df)
+```
+
+We can then plot a volcano plot to visualize the results:
+```{r}
+plotDiffTpcaVolcano(
+    diffTPCA,
+    setXLim = TRUE,
+    xlimit = c(-0.5, 0.5))
+```
+
+The underlying result table can be inspected like this;
+```{r}
+head(diffTpcaResultTable(diffTPCA) %>% 
+         arrange(p_value) %>% 
+        dplyr::select(pair, rssC1_rssC2, f_stat, p_value, p_adj))
+```
+
+We can see that none of these interactions is significant consiering the multiple comparison we have done. Yet, we can look at the melting curves of pairs like the "KPNA6:KPNB1" by evoking:
+
+```{r}
+plotPPiProfiles(diffTPCA, pair = c("KPNA6", "KPNB1"))
+```
+We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.       
+This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.      
+
+
+As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
+
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+# References
+
+Martinez Molina, D., Jafari, R., Ignatushchenko, M., Seki, T., Larsson,
+E.A., Dan, C., Sreekumar, L., Cao, Y., and Nordlund, P. (2013).
+Monitoring drug target engagement in cells and tissues using the
+cellular thermal shift assay. Science *341*, 84–87.
+
+Mateus, A., Kurzawa, N., Becher, I., Sridharan, S., Helm, D., Stein, F.,
+Typas, A., and Savitski, M.M. (2020). Thermal proteome profiling for
+interrogating protein interactions. Molecular Systems Biology 16, e9232.
+
+Savitski, M.M., Reinhard, F.B.M., Franken, H., Werner, T., Savitski,
+M.F., Eberhard, D., Martinez Molina, D., Jafari, R., Dovega, R.B.,
+Klaeger, S., et al. (2014). Tracking cancer drugs in living cells by
+thermal profiling of the proteome. Science *346, 6205*, 1255784.
+
+Tan, C.S.H., Go, K.D., Bisteau, X., Dai, L., Yong, C.H., Prabhu, N.,
+Ozturk, M.B., Lim, Y.T., Sreekumar, L., Lengqvist, J., et al. (2018).
+Thermal proximity coaggregation for system-wide profiling of protein
+complex dynamics in cells. Science *359, 6380*, 1170–1177.
