@@ -256,6 +256,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .adaptComplexAnnoFromPPi <- function(ppiAnno){
+    pair <- x <- y <- key <- value <- NULL
+    
     complex_anno <- ppiAnno %>% 
         dplyr::select(pair, x, y) %>% 
         gather(key, value, -pair) %>% 
@@ -279,6 +281,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .intersectComplexAnnotation <- function(tpcaObj, minCount = 3){
+    protein <- NULL
+    
     caDf <- tpcaObj@ComplexAnnotation
     caDfFil <- caDf %>% 
         distinct() %>% 
@@ -356,6 +360,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @importFrom stats na.omit
 .computeDistPValue <- function(tpcaDf, backgList, 
                                p_adj_method = "BH"){
+    mean_dist <- NULL
+    
     tpcaDf <- tpcaDf %>% 
         na.omit() %>% 
         rowwise() %>% 
@@ -416,6 +422,8 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 #' plotTpcaVolcano(tpca_result)
 #' 
 plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
+    mean_dist <- p_value <- p_adj <- NULL
+    
     plot_df <- tpcaObj@tpcaResultTable
     
     p <- ggplot(plot_df, aes(x = mean_dist, -log10(p_value))) + 
@@ -524,7 +532,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 #' @import tidyr
 .createPPiRocTable <- function(tpcaObj){
     colname <- value <- rowname <- pair <- 
-        annotated <- NULL
+        annotated <- TPR <- FPR <- NULL
     
     distDf <- tpcaObj@DistMat %>% 
         tbl_df %>% 
@@ -570,6 +578,8 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 
 #' @import dplyr
 .permuteComplexAnno <- function(complexAnno){
+    protein <- NULL
+    
     permComplexAnno <- complexAnno %>% 
         mutate(protein = sample(protein)) %>% 
         group_by(id) %>% 
@@ -594,7 +604,11 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 
 
 .computeComplexRocTable <- function(tpcaObj, tpca_tab, perm_tpca_tab_list){
-    complex_roc_df <- bind_rows(lapply(seq_len(length(perm_tpca_tab_list)), function(i){
+    p_value <- mean_dist <- category <- tp_count <- 
+        fp_count <- TPR <- FPR <- NULL
+    
+    complex_roc_df <- bind_rows(lapply(
+        seq_len(length(perm_tpca_tab_list)), function(i){
                                            
         perm_tpca_tab_i <-  .computeDistPValue(
             tpcaDf = perm_tpca_tab_list[[i]],
@@ -767,6 +781,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @import dplyr
 #' @import tidyr
 .distMat2AnnotatedPPiDf <- function(dist_mat, ppi_anno){
+    key <- value <- rowname <- pair <- NULL
+    
     dist_mat %>% 
         tbl_df %>% 
         mutate(rowname = rownames(dist_mat)) %>% 
@@ -782,6 +798,10 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @import dplyr
 .combineCondDistMatsFstat <- function(dist_df_c1, 
                                       dist_df_c2){
+    pair <- value <- valueC1 <- valueC2 <- rssC1 <- 
+        rssC2 <- rssC1_rssC2 <- min_rssC1_rssC2 <- 
+        NULL
+    
     combo_df <- left_join(
         dist_df_c1 %>% 
             dplyr::select(pair, valueC1 = value), 
@@ -800,6 +820,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 }
 
 .getRandomProteinPairs <- function(common_rownames, n = 10000){
+    x <- y <- NULL
+    
     random_prots <- 
         head(tibble(
             x = sample(common_rownames, n + 100, replace = TRUE),
@@ -861,6 +883,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 #' @importFrom stats na.omit
 .computeEmpiricalPValue <- function(
     combo_df, combo_rand_df, p_adj_method = "BH"){
+    f_stat <- NULL
     
     empirical_p_df <- combo_df %>% 
         na.omit() %>% 
@@ -1142,6 +1165,8 @@ plotDiffTpcaVolcano <- function(tpcaObj,
 #' plotPPiProfiles(tpcaObj, pair = c("b", "d"))
 #' 
 plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
+    temperature <- rel_value <- gene_name <- mean_dist <- 
+        p_value <- p_adj <- NULL
     plot_df <- .getDf4PlotProfiles(tpcaObj, pair)
     ggplot(plot_df, aes(temperature, rel_value)) +
         geom_point(aes(color = gene_name)) +
@@ -1221,6 +1246,8 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
 } 
 
 .gatherSubMat <- function(sub_mat, temperature_anno = NULL){
+    temperature <- rel_value <- gene_name <- NULL
+    
     if(!is.null(temperature_anno)){
         colnames(sub_mat) <- as.character(temperature_anno)
     }
