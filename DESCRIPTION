@@ -1,13 +1,15 @@
 Package: Rtpca
 Title: Thermal proximity co-aggregation with R
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(
     person("Nils", "Kurzawa", email = "nils.kurzawa@embl.de", 
         role = c("aut", "cre")),
     person("André", "Mateus", role = c("aut")),
     person("Mikhail M.", "Savitski", role = c("aut")))
 Description: R package for performing thermal proximity co-aggregation 
-    analysis with thermal proteome profiling datasets.
+    analysis with thermal proteome profiling datasets to analyse protein 
+    complex assembly and (differential) protein-protein interactions across
+    conditions.
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
