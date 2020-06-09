@@ -57,13 +57,13 @@ expect_identical(
 
 tbl_list <- list(
     data.frame(m1) %>% 
-        tbl_df %>% 
+        as_tibble() %>% 
         mutate(gene_name = 1:3), 
     data.frame(m2) %>% 
-        tbl_df %>% 
+        as_tibble() %>% 
         mutate(gene_name = 2:4), 
     data.frame(m3) %>% 
-        tbl_df %>% 
+        as_tibble() %>% 
         mutate(gene_name = 2:5)
 )
 

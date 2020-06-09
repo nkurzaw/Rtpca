@@ -24,6 +24,8 @@ of a protein pair across conditions
 Plot thermal profile of protein pairs
 }
 \examples{
+library(Biobase)
+
 set.seed(12)
 m1 <- matrix(rnorm(50), ncol = 10)
 m2 <- matrix(rnorm(50), ncol = 10)

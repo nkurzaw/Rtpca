@@ -14,7 +14,46 @@ summarizing a TPP experiment)
 2) ContrastList: containing the supplied list 
 of constrast objects (if supplied for
 performance of a differential Rtpca analysis)
-3)
+3) CtrlCondName: character string indicating
+the control condition, e.g. "control"
+4) ContrastCondName: character string indicating
+the contrast condition, e.g. "drug treatment"
+5) DistMat: a matrix containing all pairwise
+protein-protein distances obtained from comparing
+their melting curves in the control condition
+6) ContrastDistMat: a matrix containing all pairwise
+protein-protein distances obtained from comparing
+their melting curves in the contrast condition
+7) CommonFeatures: a vector containing the features
+(proteins) found in common between control and 
+contrast condition
+8) ComplexAnnotation: a data frame supplied by the
+user annotating protein to protein complexes
+9) ComplexBackgroundDistributionList: a list of 
+distances drawn for random groups of proteins
+with different number of members
+10) PPiAnnotation: a data frame supplied by the
+user annotating protein-protein interactions
+11) PPiRocTable: data frame containing false positive
+rate and true positive rate based on ranking the TPCA
+analysis results by euclidean distance of melting curves
+of protein pairs, annotated PPIs are considered true 
+positives
+12) PPiRocTableAnno: annotation to PPiRocTable
+13) ComplexRocTable: data frame containing false positive
+rate and true positive rate based on ranking the TPCA
+analysis results by euclidean distance of melting curves
+of proteins within annotated complexes, annotated complexes
+are considered true positives, proteins in randomly permuted 
+complex annotations are considered false positives
+14) summaryMethod: character string of summarization method
+used to summarize data across replicates
+15) distMethod: character string of distance method
+used to compare melting curves of proteins
+16) tpcaResultTable: data frame containing the results
+from a tpca analysis
+17) diffTpcaResultTable: data frame containing the results
+from a differential tpca analysis
 }
 \description{
 S4 TPCA Result Class

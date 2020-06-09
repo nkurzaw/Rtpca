@@ -8,7 +8,7 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-"
+  fig.path = "inst/figures/README-"
   # out.width = "100%"
 )
 ```
@@ -23,12 +23,12 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Install the development version of the package from Github.
+Installation from *Bioconductor*
 
 ```{r eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("nkurzaw/Rtpca"")
+BiocManager::install("Rtpca")
 ```
 
 

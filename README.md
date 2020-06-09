@@ -11,12 +11,12 @@ Rtpca
 Installation
 ============
 
-Install the development version of the package from Github.
+Installation from *Bioconductor*
 
 ``` r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("nkurzaw/Rtpca"")
+BiocManager::install("Rtpca")
 ```
 
 1.  Load the package into your R session.
@@ -202,7 +202,7 @@ plotPPiRoc(vehTPCA, computeAUC = TRUE)
 #> Warning: Removed 2065 row(s) containing missing values (geom_path).
 ```
 
-![](man/figures/README-unnamed-chunk-12-1.png)
+![](inst/figures/README-unnamed-chunk-12-1.png)
 
 And we can also plot a ROC curve for how well our data captures protein complexes:
 
@@ -210,7 +210,7 @@ And we can also plot a ROC curve for how well our data captures protein complexe
 plotComplexRoc(vehComplexTPCA, computeAUC = TRUE)
 ```
 
-![](man/figures/README-unnamed-chunk-13-1.png)
+![](inst/figures/README-unnamed-chunk-13-1.png)
 
 Run differential TPCA on two conditions
 ---------------------------------------
@@ -241,7 +241,7 @@ plotDiffTpcaVolcano(
     xlimit = c(-0.5, 0.5))
 ```
 
-![](man/figures/README-unnamed-chunk-15-1.png)
+![](inst/figures/README-unnamed-chunk-15-1.png)
 
 The underlying result table can be inspected like this;
 
@@ -266,7 +266,7 @@ We can see that none of these interactions is significant consiering the multipl
 plotPPiProfiles(diffTPCA, pair = c("KPNA6", "KPNB1"))
 ```
 
-![](man/figures/README-unnamed-chunk-17-1.png) We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.
+![](inst/figures/README-unnamed-chunk-17-1.png) We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.
 This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.
 
 As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
@@ -292,7 +292,7 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#> [1] TPP_3.16.0          magrittr_1.5        Rtpca_0.99.0       
+#> [1] TPP_3.16.2          magrittr_1.5        Rtpca_0.99.0       
 #> [4] tidyr_1.1.0         dplyr_1.0.0         Biobase_2.48.0     
 #> [7] BiocGenerics_0.34.0
 #> 

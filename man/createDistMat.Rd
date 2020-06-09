@@ -37,6 +37,8 @@ Create distance matrix of all vs all protein
 melting profiles
 }
 \examples{
+library(Biobase)
+
 m1 <- matrix(1:12, ncol = 4)
 m2 <- matrix(2:13, ncol = 4)
 m3 <- matrix(c(2:10, 1:7), ncol = 4)

@@ -141,6 +141,8 @@ runTPCA <- function(objList,
 #' melting profiles
 #' 
 #' @examples 
+#' library(Biobase)
+#' 
 #' m1 <- matrix(1:12, ncol = 4)
 #' m2 <- matrix(2:13, ncol = 4)
 #' m3 <- matrix(c(2:10, 1:7), ncol = 4)
@@ -535,7 +537,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
         annotated <- TPR <- FPR <- NULL
     
     distDf <- tpcaObj@DistMat %>% 
-        tbl_df %>% 
+        as_tibble() %>% 
         mutate(rowname = rownames(tpcaObj@DistMat)) %>% 
         gather(colname, value, -rowname) %>% 
         rowwise() %>% 
@@ -784,7 +786,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     key <- value <- rowname <- pair <- NULL
     
     dist_mat %>% 
-        tbl_df %>% 
+        as_tibble() %>% 
         mutate(rowname = rownames(dist_mat)) %>% 
         gather(key, value, -rowname) %>% 
         rowwise %>% 
@@ -1131,6 +1133,8 @@ plotDiffTpcaVolcano <- function(tpcaObj,
 #' @importFrom splines ns
 #' @export
 #' @examples 
+#' library(Biobase)
+#' 
 #' set.seed(12)
 #' m1 <- matrix(rnorm(50), ncol = 10)
 #' m2 <- matrix(rnorm(50), ncol = 10)
@@ -1252,7 +1256,7 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
         colnames(sub_mat) <- as.character(temperature_anno)
     }
     cond_df <- sub_mat %>%
-        tbl_df %>%
+        as_tibble() %>%
         mutate(gene_name = rownames(sub_mat)) %>%
         gather(temperature, rel_value, -gene_name) %>% 
         mutate(temperature = as.numeric(temperature))

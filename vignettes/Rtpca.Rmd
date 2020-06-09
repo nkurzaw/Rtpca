@@ -24,11 +24,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Installation
 
-Install the development version of the package from Github.
+Installation from *Bioconductor*
 ```{r, eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install(“nkurzaw/Rtpca”)
+BiocManager::install("Rtpca")
 ```
 
 2. Load the package into your R session.
