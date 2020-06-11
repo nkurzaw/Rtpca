@@ -38,16 +38,30 @@ library(Rtpca)
 
 # Introduction
 
-Thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] is a mass spectrometry-based, proteome-wide implemention of the cellular thermal shift assay [@Molina2013]. It was originally developed to study drug-(off-)target engagement. However, it was realized that profiles of interacting protein pairs appeared more similar than by chance which was coined as 'thermal proximity co-aggregation' (TPCA) [@Tan2018]. The R package `Rtpca` enables analysis of TPP datasets using the TPCA concept for studying protein-protein interactions and protein complexes and also allows to test for differential protein-protein interactions across different conditions.         
+Thermal proteome profiling (TPP) [@Savitski2014; @Mateus2020] is a mass
+spectrometry-based, proteome-wide implemention of the cellular thermal shift
+assay [@Molina2013]. It was originally developed to study drug-(off-)target
+engagement. However, it was realized that profiles of interacting protein 
+pairs appeared more similar than by chance which was coined as 
+'thermal proximity co-aggregation' (TPCA) [@Tan2018]. The R package `Rtpca`
+enables analysis of TPP datasets using the TPCA concept for studying
+protein-protein interactions and protein complexes and also allows to test for
+differential protein-protein interactions across different conditions.         
 
-This vignette only represents a minimal example. To have a look at a more realistic example feel free to check out [this more realistic example](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
+This vignette only represents a minimal example. To have a look at a more
+realistic example feel free to check out [this more realisticexample](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
-We also load the `TPP` package to illustrate how to import TPP data with the Bioconductor package and then input in into the `Rtpca` functions.
+# The `Rtpca` package workflow
+
+We also load the `TPP` package to illustrate how to import TPP data with the
+Bioconductor package and then input it into the `Rtpca` functions.
 ```{r, message=FALSE, warning=FALSE}
 library(TPP)
 ```
 
-## Import Thermal proteome profiling data using the TPP package
+## Import Thermal proteome profiling data using the `TPP` package
+
+We load the data `hdacTR_smallExample` which is part of the `TPP` package
 ```{r}
 data("hdacTR_smallExample")
 ```
@@ -64,18 +78,26 @@ hdacTR_data_fil <- lapply(hdacTR_data, function(temp_df){
 })
 ```
 
-We can now import our small example dataset using the import function from the `TPP` package:
+We can now import our small example dataset using the import function from 
+the `TPP` package:
 ```{r}
 trData <- tpptrImport(configTable = hdacTR_config, data = hdacTR_data_fil)
 ```
 
+## Performing thermal co-aggregation analysis with `Rtpca`
+
+Then, we load `string_ppi_df` which is a data frame that annotates
+protein-protein interactions as obtained from StringDB [@Szklarczyk2019] that
+comes with the `Rtpca` package
 ```{r}
 data("string_ppi_df")
+string_ppi_df
 ```
 
-## Run TPCA on data from a single condition
+### Run TPCA on data from a single condition
 
-We can run TPCA for protein-protein interactions like this:
+We can run TPCA for protein-protein interactions like this by using the 
+function `runTPCA` 
 ```{r}
 string_ppi_cs_950_df <- string_ppi_df %>% 
     filter(combined_score >= 950 )
@@ -85,12 +107,22 @@ vehTPCA <- runTPCA(
     ppiAnno = string_ppi_cs_950_df
 )
 ```
-Note: it is not necessary that your data has the format of the TPP package (ExpressionSet), you can also supply the function with a list of matrices of data frames (in the case of data frames you need to additionally indicate with column contains the protein or gene names).
+Note: it is not necessary that your data has the format of the TPP package
+(ExpressionSet), you can also supply the function with a list of matrices of 
+data frames (in the case of data frames you need to additionally indicate with
+column contains the protein or gene names).
 
-We can also run TPCA to test for coaggregation of protein complexes like this:
+We can also run TPCA to test for coaggregation of protein complexes. For this
+purpose with can load a data frame that annotates proteins to protein complexes
+curated by @Ori2016
 ```{r}
 data("ori_et_al_complexes_df")
+ori_et_al_complexes_df
+```
 
+Then, we can invoke
+
+```{r}
 vehComplexTPCA <- runTPCA(
     objList = trData,
     complexAnno = ori_et_al_complexes_df,
@@ -98,12 +130,14 @@ vehComplexTPCA <- runTPCA(
 )
 ```
 
-We can plot a ROC curve for how well our data captures protein-protein interactions:
+We can plot a ROC curve for how well our data captures protein-protein
+interactions:
 ```{r}
 plotPPiRoc(vehTPCA, computeAUC = TRUE)
 ```
 
-And we can also plot a ROC curve for how well our data captures protein complexes:
+And we can also plot a ROC curve for how well our data captures protein
+complexes:
 
 ```{r}
 plotComplexRoc(vehComplexTPCA, computeAUC = TRUE)
@@ -111,9 +145,10 @@ plotComplexRoc(vehComplexTPCA, computeAUC = TRUE)
 ```
 
 
-## Run differential TPCA on two conditions 
+### Run differential TPCA on two conditions 
 
-In order to test for protein-protein interactions that change significantly between both conditions, we can run the `runDiffTPCA` as illustrated below:
+In order to test for protein-protein interactions that change significantly
+between both conditions, we can run the `runDiffTPCA` as illustrated below:
 
 ```{r}
 diffTPCA <- 
@@ -140,16 +175,25 @@ head(diffTpcaResultTable(diffTPCA) %>%
         dplyr::select(pair, rssC1_rssC2, f_stat, p_value, p_adj))
 ```
 
-We can see that none of these interactions is significant consiering the multiple comparison we have done. Yet, we can look at the melting curves of pairs like the "KPNA6:KPNB1" by evoking:
+We can see that none of these interactions is significant consiering the 
+multiple comparison we have done. Yet, we can look at the melting curves of 
+pairs like the "KPNA6:KPNB1" by evoking:
 
 ```{r}
 plotPPiProfiles(diffTPCA, pair = c("KPNA6", "KPNB1"))
 ```
-We can see that both protein do seem to coaggregate, but that the mild difference in the treatment condition compared to the control condition is likely due to technical rather than biological reasons.       
-This way of inspecting hits obtained by the differential analysis is recommended in the case that significant pairs can be found to validate that they do coaggregate in one condition and that the less strong coaggregations in the other condition is based on reliable signal.      
+We can see that both protein do seem to coaggregate, but that the mild 
+difference in the treatment condition compared to the control condition is 
+likely due to technical rather than biological reasons.       
+This way of inspecting hits obtained by the differential analysis is 
+recommended in the case that significant pairs can be found to validate that 
+they do coaggregate in one condition and that the less strong coaggregations 
+in the other condition is based on reliable signal.      
 
 
-As mentioned above, this vignette includes only a very minimal example, have a look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
+# Additional remarks
+As mentioned above, this vignette includes only a very minimal example, have a
+look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
 ```{r}
 sessionInfo()

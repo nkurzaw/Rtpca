@@ -76,7 +76,7 @@ runTPCA <- function(objList,
                     minCount = 3,
                     nSamp = 10000,
                     p_adj_method = "BH"
-                    ){
+){
     message("Checking input arguments. \n")
     tpcaObj <- .checkAnnoArguments(
         objList = objList,
@@ -174,8 +174,8 @@ runTPCA <- function(objList,
 #' @export
 #' @importFrom stats dist
 createDistMat <- function(objList, rownameCol = NULL, 
-                           summaryMethod = "median",
-                           distMethod = "euclidean"){
+                        summaryMethod = "median",
+                        distMethod = "euclidean"){
     common_rownames <-
         .getCommonRownames(objList, rownameCol = rownameCol)
     mat_list <- .getMatList(objList, 
@@ -184,7 +184,7 @@ createDistMat <- function(objList, rownameCol = NULL,
     summarized_mat <- .getSummarizedMat(matList = mat_list,
                                         sumMethod = summaryMethod)
     dist_mat <- as.matrix(dist(summarized_mat,
-                               method = distMethod))
+                        method = distMethod))
     return(dist_mat)
 }
 
@@ -227,24 +227,24 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
                         rocTab$eucl_dist)[1]), 3)))
     }
     p <- ggplot(rocTab, 
-           aes(FPR, TPR)) + 
+                aes(FPR, TPR)) + 
         geom_path() +
         geom_line(aes(x, y),
-                  color = "gray",
-                  data = tibble(x = 0:1, y = 0:1),
-                  linetype = "dashed") +
+                color = "gray",
+                data = tibble(x = 0:1, y = 0:1),
+                linetype = "dashed") +
         theme_bw()
     if(computeAUC){
         p <- p + geom_text(aes(x, y, label = label), 
-                           data = tibble(x = 0.75, y = 0.1,
-                                         label = aucText))
+                        data = tibble(x = 0.75, y = 0.1,
+                            label = aucText))
     }
     return(p)
-        
+    
 }
 
 .testForPPiCoAggregation <- function(tpcaObj, nSamp = 10000,
-                                     p_adj_method = "BH"){
+                                    p_adj_method = "BH"){
     tpcaObj@ComplexAnnotation <- 
         .adaptComplexAnnoFromPPi(
             tpcaObj@PPiAnnotation)
@@ -268,10 +268,9 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
     return(complex_anno)
 }
 
-.testForComplexCoAggregation <- function(tpcaObj, 
-                                        minCount = 3,
-                                        nSamp = 10000,
-                                        p_adj_method = "BH"){
+.testForComplexCoAggregation <- function(
+    tpcaObj, minCount = 3,
+    nSamp = 10000, p_adj_method = "BH"){
     tpcaObj <- .intersectComplexAnnotation(
         tpcaObj, minCount = minCount)
     tpcaObj <- .setBackgroundDistribution(
@@ -290,7 +289,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
         distinct() %>% 
         filter(
             protein %in% 
-            tpcaObj@CommonFeatures) %>% 
+                CommonFeatures(tpcaObj)) %>% 
         group_by(id) %>% 
         mutate(count = n()) %>% 
         ungroup %>% 
@@ -310,7 +309,7 @@ plotPPiRoc <- function(tpcaObj, computeAUC = FALSE){
 .createBackgroundDistList <- function(distMat, nMemVec, nSamp = 10000){
     backgList <- lapply(nMemVec, function(x) {
         .sampleBackgroundDistribution(distMat, nMem = x, nSamp = nSamp)
-        })
+    })
     names(backgList) <- nMemVec
     return(backgList)
 }
@@ -444,21 +443,21 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
                                   summaryMethod = "median",
                                   distMethod = "euclidean",
                                   cond = "c1"){
-
+    
     if(length(tpcaObj@ContrastList) == 0){
-        tpcaObj@CommonFeatures <- .getCommonRownames(
-            objList = tpcaObj@ObjList,
+        tpcaObj <- SetCommonFeatures(tpcaObj, .getCommonRownames(
+            objList = ObjList(tpcaObj),
             rownameCol = rownameCol
-        )  
+        ))  
     }else{
-        tpcaObj@CommonFeatures <- .getCommonRownames(
-            objList = c(tpcaObj@ObjList, tpcaObj@ContrastList),
+        tpcaObj <- SetCommonFeatures(tpcaObj, .getCommonRownames(
+            objList = c(ObjList(tpcaObj), tpcaObj@ContrastList),
             rownameCol = rownameCol
-        )  
+        ))
     }
     
     distMat <- createDistMat(
-        objList = tpcaObj@ObjList, 
+        objList = ObjList(tpcaObj), 
         rownameCol = rownameCol, 
         summaryMethod = summaryMethod,
         distMethod = distMethod
@@ -471,8 +470,6 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
             distMethod = distMethod
         )
     }
-    # chunkDim <- ifelse(ncol(distMat) < 250, 
-    #                    ncol(distMat), 250)
     tpcaObj@summaryMethod <- summaryMethod
     tpcaObj@distMethod <- distMethod
     tpcaObj@DistMat <- distMat 
@@ -481,12 +478,6 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
         tpcaObj@ContrastDistMat <- contrastDistMat
         dimnames(tpcaObj@ContrastDistMat) <- dimnames(contrastDistMat)
     }
-    
-    # writeHDF5Array(
-    #     distMat,
-    #     chunkdim = c(chunkDim, chunkDim)
-    # )
-    
     return(tpcaObj)
 }
 
@@ -550,7 +541,7 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
         mutate(annotated = pair %in% 
                    tpcaObj@PPiAnnotation$pair) %>% 
         mutate(TPR = cumsum(as.numeric(annotated)) / 
-                    sum(as.numeric(annotated)), 
+                   sum(as.numeric(annotated)), 
                FPR = cumsum(as.numeric(annotated == FALSE)) / 
                    (n() - cumsum(as.numeric(value != 0)) +  
                         cumsum(as.numeric(annotated == FALSE))))
@@ -611,25 +602,25 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     
     complex_roc_df <- bind_rows(lapply(
         seq_len(length(perm_tpca_tab_list)), function(i){
-                                           
-        perm_tpca_tab_i <-  .computeDistPValue(
-            tpcaDf = perm_tpca_tab_list[[i]],
-            backgList = tpcaObj@ComplexBackgroundDistributionList,
-            p_adj_method = "BH"
-        )         
-                                           
-        roc_df <- bind_rows(
-            tpca_tab %>% 
-                mutate(category = "TP"),
-            perm_tpca_tab_i %>% 
-                mutate(category = "FP")) %>% 
-            arrange(p_value, mean_dist) %>% 
-            mutate(rank = seq_len(n()),
-                   tp_count = cumsum(as.numeric(category == "TP")),
-                   fp_count = cumsum(as.numeric(category == "FP"))) %>% 
-            mutate(TPR = tp_count / nrow(tpca_tab),
-                   FPR = (fp_count/nrow(perm_tpca_tab_i))) 
-    })) %>% 
+            
+            perm_tpca_tab_i <-  .computeDistPValue(
+                tpcaDf = perm_tpca_tab_list[[i]],
+                backgList = tpcaObj@ComplexBackgroundDistributionList,
+                p_adj_method = "BH"
+            )         
+            
+            roc_df <- bind_rows(
+                tpca_tab %>% 
+                    mutate(category = "TP"),
+                perm_tpca_tab_i %>% 
+                    mutate(category = "FP")) %>% 
+                arrange(p_value, mean_dist) %>% 
+                mutate(rank = seq_len(n()),
+                       tp_count = cumsum(as.numeric(category == "TP")),
+                       fp_count = cumsum(as.numeric(category == "FP"))) %>% 
+                mutate(TPR = tp_count / nrow(tpca_tab),
+                       FPR = (fp_count/nrow(perm_tpca_tab_i))) 
+        })) %>% 
         group_by(rank) %>% 
         summarize(TPR = mean(TPR, na.rm = TRUE),
                   FPR = mean(FPR, na.rm = TRUE))
@@ -747,7 +738,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 .checkMatDims <- function(matList){
     dim_list <- lapply(matList, dim)
     if(!all(vapply(dim_list, identical, dim_list[[1]], 
-            FUN.VALUE = TRUE))){
+                   FUN.VALUE = TRUE))){
         stop("checkMatDims: unequal matrix dimensions!")
     }
 }
@@ -865,7 +856,7 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
 
 .compareConditionsRandom <- function(tpcaObj, n = 10000){
     commonRownames <- .getCommonRownames(
-        c(tpcaObj@ObjList, tpcaObj@ContrastList)
+        c(ObjList(tpcaObj), tpcaObj@ContrastList)
     )
     
     random_prot_pairs <- .getRandomProteinPairs(
@@ -1101,12 +1092,13 @@ plotDiffTpcaVolcano <- function(tpcaObj,
     plot_df <- tpcaObj@diffTpcaResultTable
     controlCond <- tpcaObj@CtrlCondName
     constrastCond <- tpcaObj@ContrastCondName
-    p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(valueC2), -log10(p_value))) + 
+    p <- ggplot(plot_df, aes(x = sqrt(valueC1) - sqrt(valueC2), 
+                             -log10(p_value))) + 
         geom_point(color = "gray", alpha = 0.75) + 
         geom_point(data = filter(plot_df, p_adj < alpha)) + 
         theme_bw() +
         labs(x = bquote(sqrt(italic(d)[.(controlCond)])~ ' - ' 
-                            ~sqrt(italic(d)[.(constrastCond)])),
+                        ~sqrt(italic(d)[.(constrastCond)])),
              y = expression('-log'[10]*'('*italic(p)*' value)'))
     
     if(setXLim){
@@ -1182,12 +1174,13 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
         scale_color_brewer("protein", palette = "Set1") +
         labs(y = "fraction non-denatured") +
         theme_bw()
-        
+    
 }
 
 .getDf4PlotProfiles <- function(tpcaObj, pair){
-    if(class(tpcaObj@ObjList[[1]])[1] == "ExpressionSet"){
-        full_cond_df <- bind_rows(lapply(tpcaObj@ObjList, function(eset){
+    tpcaObjList <- ObjList(tpcaObj)
+    if(class(tpcaObjList[[1]])[1] == "ExpressionSet"){
+        full_cond_df <- bind_rows(lapply(tpcaObjList, function(eset){
             sub_mat <- exprs(eset)[rownames(eset) %in% pair,]
             sub_cond1_df <- .gatherSubMat(
                 sub_mat = sub_mat,
@@ -1196,13 +1189,14 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
         })) %>% mutate(condition = tpcaObj@CtrlCondName)
         if(length(tpcaObj@ContrastList) != 0){
             if(class(tpcaObj@ContrastList[[1]])[1] == "ExpressionSet"){
-                cond2_df <- bind_rows(lapply(tpcaObj@ContrastList, function(eset){
-                    sub_mat <- exprs(eset)[rownames(eset) %in% pair,]
-                    sub_cond2_df <- .gatherSubMat(
-                        sub_mat = sub_mat,
-                        temperature_anno = eset$temperature
-                    )
-                })) %>% mutate(condition = tpcaObj@ContrastCondName)
+                cond2_df <- bind_rows(lapply(
+                    tpcaObj@ContrastList, function(eset){
+                        sub_mat <- exprs(eset)[rownames(eset) %in% pair,]
+                        sub_cond2_df <- .gatherSubMat(
+                            sub_mat = sub_mat,
+                            temperature_anno = eset$temperature
+                        )
+                    })) %>% mutate(condition = tpcaObj@ContrastCondName)
                 full_cond_df <- bind_rows(
                     full_cond_df, cond2_df
                 )
@@ -1212,11 +1206,11 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
                      while ContrastList ist not!\n")
             }
         }else{
-           return(full_cond_df) 
+            return(full_cond_df) 
         }
     }
-    else if(class(tpcaObj@ObjList[[1]])[1] %in% c("matrix", "data.frame")){
-        full_cond_df <- bind_rows(lapply(tpcaObj@ObjList, function(mat){
+    else if(class(tpcaObjList[[1]])[1] %in% c("matrix", "data.frame")){
+        full_cond_df <- bind_rows(lapply(tpcaObjList, function(mat){
             sub_mat <- mat[rownames(mat) %in% pair,]
             sub_cond1_df <- .gatherSubMat(
                 sub_mat = sub_mat,
@@ -1224,14 +1218,16 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
             )
         })) %>% mutate(condition = tpcaObj@CtrlCondName)
         if(length(tpcaObj@ContrastList) != 0){
-            if(class(tpcaObj@ContrastList[[1]])[1] %in% c("matrix", "data.frame")){
-                cond2_df <- bind_rows(lapply(tpcaObj@ContrastList, function(mat){
-                    sub_mat <- mat[rownames(mat) %in% pair,]
-                    sub_cond2_df <- .gatherSubMat(
-                        sub_mat = sub_mat,
-                        temperature_anno = attributes(mat)$temperature
-                    )
-                })) %>% mutate(condition = tpcaObj@ContrastCondName)
+            if(class(tpcaObj@ContrastList[[1]])[1] %in% 
+               c("matrix", "data.frame")){
+                cond2_df <- bind_rows(lapply(
+                    tpcaObj@ContrastList, function(mat){
+                        sub_mat <- mat[rownames(mat) %in% pair,]
+                        sub_cond2_df <- .gatherSubMat(
+                            sub_mat = sub_mat,
+                            temperature_anno = attributes(mat)$temperature
+                        )
+                    })) %>% mutate(condition = tpcaObj@ContrastCondName)
                 full_cond_df <- bind_rows(
                     full_cond_df, cond2_df
                 )
@@ -1242,11 +1238,11 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
             }
         }
     }
-    # }else if((class(tpcaObj@ObjList[[1]])[1] %in% c("tbl_df")) &
+    # }else if((class(tpcaObjList[[1]])[1] %in% c("tbl_df")) &
     #          !is.null(rownameCol)){
     #     
     # }
-    # cond1_df <- tpcaObj@objList
+    # cond1_df <- tpcaObjList
 } 
 
 .gatherSubMat <- function(sub_mat, temperature_anno = NULL){

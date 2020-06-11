@@ -1,6 +1,6 @@
 Package: Rtpca
 Title: Thermal proximity co-aggregation with R
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(
     person("Nils", "Kurzawa", email = "nils.kurzawa@embl.de", 
         role = c("aut", "cre")),
