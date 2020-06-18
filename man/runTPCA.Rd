@@ -9,8 +9,8 @@ runTPCA(
   complexAnno = NULL,
   ppiAnno = NULL,
   rownameCol = NULL,
-  summaryMethod = "median",
-  distMethod = "euclidean",
+  summaryMethodStr = "median",
+  distMethodStr = "euclidean",
   doRocAnalysis = TRUE,
   minCount = 3,
   nSamp = 10000,
@@ -32,11 +32,11 @@ protein-protein interactions (PPI) to test}
 this parameter takes in the name (character) of the column 
 specifying protein names or ids}
 
-\item{summaryMethod}{character string indicating a method 
+\item{summaryMethodStr}{character string indicating a method 
 to use to summarize measurements across replicates, 
 default is "median", other options are c("mean", "rbind")}
 
-\item{distMethod}{method to use within dist function,
+\item{distMethodStr}{method to use within dist function,
 default is 'euclidean'}
 
 \item{doRocAnalysis}{logical indicating whether a ROC 

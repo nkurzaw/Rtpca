@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 
-> Differential thermal co-aggregation analysis of TPP datasets using R
+> Differential thermal co-aggregation analysis with TPP datasets using R
 
 # Installation
 

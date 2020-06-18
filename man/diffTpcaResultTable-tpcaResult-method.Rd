@@ -8,7 +8,7 @@
 \S4method{diffTpcaResultTable}{tpcaResult}(object)
 }
 \arguments{
-\item{object}{and object of class tpcaResult}
+\item{object}{an object of class tpcaResult}
 }
 \value{
 a data frame containing the results

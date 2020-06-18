@@ -8,7 +8,7 @@
 \S4method{ObjList}{tpcaResult}(object)
 }
 \arguments{
-\item{object}{and object of class tpcaResult}
+\item{object}{an object of class tpcaResult}
 }
 \value{
 an object list containing TPP data

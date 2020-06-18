@@ -12,8 +12,8 @@ runDiffTPCA(
   ppiAnno = NULL,
   complexAnno = NULL,
   rownameCol = NULL,
-  summaryMethod = "median",
-  distMethod = "euclidean",
+  summaryMethodStr = "median",
+  distMethodStr = "euclidean",
   n = 10000,
   p_adj_method = "BH"
 )
@@ -43,11 +43,11 @@ known protein complexes of interest to test}
 this parameter takes in the name (character) of the column 
 specifying protein names or ids}
 
-\item{summaryMethod}{character string indicating a method 
+\item{summaryMethodStr}{character string indicating a method 
 to use to summarize measurements across replicates, 
 default is "median", other options are c("mean", "rbind")}
 
-\item{distMethod}{method to use within dist function,
+\item{distMethodStr}{method to use within dist function,
 default is 'euclidean'}
 
 \item{n}{number of random protein pair draws to obtain
