@@ -94,7 +94,7 @@ data("string_ppi_df")
 string_ppi_df
 ```
 
-This table has been created for the human *protein.links* table downloaded from the StringDB website. It can serve as a template for users to create equivalent tables for other organisms.
+This table has been created from the human *protein.links* table downloaded from the StringDB website. It can serve as a template for users to create equivalent tables for other organisms.
 
 ### Run TPCA on data from a single condition
 
