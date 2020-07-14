@@ -19,7 +19,12 @@ ggplot object of a receiver operating
 curve (ROC)
 }
 \description{
-Plot Complex ROC curve
+Plots a ROC curve representing how well a given
+TPP dataset recovers annotated proteins complexes.
+The ROC curve is generated based on the supplied protein 
+complex annotation specificity is assessed by comparing
+the given complex annotation to random permutations of 
+that table, i.e. proteins randomly grouped together.
 }
 \examples{
 rocTab = data.frame(
