@@ -1,6 +1,6 @@
 Package: Rtpca
 Title: Thermal proximity co-aggregation with R
-Version: 0.99.7
+Version: 0.99.8
 Authors@R: c(
     person("Nils", "Kurzawa", email = "nils.kurzawa@embl.de", 
         role = c("aut", "cre")),
@@ -17,6 +17,6 @@ LazyData: false
 biocViews: Software, Proteomics, DataImport
 BugReports: https://support.bioconductor.org/
 Depends: R (>= 4.0.0), stats, dplyr, tidyr
-Imports: Biobase, methods, ggplot2, pROC, fdrtool, splines, utils
+Imports: Biobase, methods, ggplot2, pROC, fdrtool, splines, utils, tibble
 Suggests: knitr, BiocStyle, TPP, testthat
 RoxygenNote: 7.1.0

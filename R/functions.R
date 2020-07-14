@@ -522,16 +522,25 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     colname <- value <- rowname <- pair <- 
         annotated <- TPR <- FPR <- NULL
     
-    distDf <- DistMat(tpcaObj) %>% 
+    distMat <- DistMat(tpcaObj)
+    distMat[lower.tri(distMat)] <- NA
+    
+    distDf <- distMat %>% 
+        as.data.frame() %>% 
+        tibble::rownames_to_column() %>% 
         as_tibble() %>% 
-        mutate(rowname = rownames(DistMat(tpcaObj))) %>% 
-        gather(colname, value, -rowname) %>% 
+        #mutate(rowname = rownames(distMat)) %>% 
+        pivot_longer(
+            cols = !starts_with("rowname"),
+            names_to = "colname", 
+            values_to = "value",
+            values_drop_na = TRUE) %>% 
         rowwise() %>% 
         mutate(pair = paste(sort(c(rowname, colname)), 
                             collapse = ":")) %>% 
         ungroup %>% 
-        filter(rowname != colname,
-               !duplicated(pair)) %>% 
+        # filter(rowname != colname,
+        #        !duplicated(pair)) %>% 
         arrange(value) %>% 
         mutate(annotated = pair %in% 
                    PPiAnnotation(tpcaObj)$pair) %>% 
@@ -626,6 +635,14 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
 }
 
 #' Plot Complex ROC curve
+#' 
+#' Plots a ROC curve representing how well a given
+#' TPP dataset recovers annotated proteins complexes.
+#' The ROC curve is generated based on the supplied protein 
+#' complex annotation specificity is assessed by comparing
+#' the given complex annotation to random permutations of 
+#' that table, i.e. proteins randomly grouped together.
+#' 
 #' @param tpcaObj tpcaResult object
 #' @param computeAUC logical parameter indicating
 #' whether area under the ROC should be computed
