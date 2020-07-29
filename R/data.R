@@ -30,7 +30,7 @@
 
 #' @title Data frame of annotated human protein-protein
 #' interactions retrieved from stringDB with a combined
-#' interaciton score euqal or higher than 700
+#' interaction score equal or higher than 700
 #' @name string_ppi_df
 #' @docType data
 #' @description data frame assigning proteins to 
