@@ -539,8 +539,8 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
         mutate(pair = paste(sort(c(rowname, colname)), 
                             collapse = ":")) %>% 
         ungroup %>% 
-        # filter(rowname != colname,
-        #        !duplicated(pair)) %>% 
+        filter(rowname != colname,
+               !duplicated(pair)) %>%
         arrange(value) %>% 
         mutate(annotated = pair %in% 
                    PPiAnnotation(tpcaObj)$pair) %>% 
