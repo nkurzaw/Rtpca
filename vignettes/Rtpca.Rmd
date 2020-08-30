@@ -51,6 +51,13 @@ differential protein-protein interactions across different conditions.
 This vignette only represents a minimal example. To have a look at a more
 realistic example feel free to check out [this more realisticexample](https://github.com/nkurzaw/Rtpca_analysis/blob/master/Becher_et_al_reanalysis.pdf).
 
+**Note:** if you use `Rtpca` in published research, please cite:
+
+> Kurzawa, N., Mateus, A. & Savitski, M.M. (2020)
+> Rtpca: an R package for differential thermal proximity coaggregation analysis.
+> *Bioinformatics*, [10.1093/bioinformatics/btaa682](https://doi.org/10.1093/bioinformatics/btaa682)
+
+
 # The `Rtpca` package workflow
 
 We also load the `TPP` package to illustrate how to import TPP data with the
