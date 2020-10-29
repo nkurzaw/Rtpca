@@ -827,7 +827,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     return(combo_df)
 }
 
-.getRandomProteinPairs <- function(common_rownames, n = 10000){
+.getRandomProteinPairs <- function(common_rownames, n = 10000,
+                                   ppi_anno = NULL){
     x <- y <- NULL
     
     random_prots <- 
@@ -839,6 +840,10 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         rowwise() %>% 
         mutate(pair = paste(sort(c(x, y)), collapse = ":")) %>% 
         ungroup 
+    if(!is.null(ppi_anno)){
+        random_prots <- 
+            filter(random_prots, !pair %in% ppi_anno$pair)
+    }
     
     return(random_prots)
 }
@@ -869,7 +874,8 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
     return(comboDf)
 }
 
-.compareConditionsRandom <- function(tpcaObj, n = 10000){
+.compareConditionsRandom <- function(tpcaObj, n = 10000, 
+                                     ppi_anno = NULL){
     commonRownames <- .getCommonRownames(
         c(ObjList(tpcaObj), ContrastList(tpcaObj))
     )
@@ -1025,7 +1031,8 @@ runDiffTPCA <- function(objList,
         message("Comparing random protein-pairs across conditions. \n")
         combo_rand_df <- .compareConditionsRandom(
             tpcaObj = tpcaObj, 
-            n = n
+            n = n,
+            ppi_anno = ppiAnno
         )
     }else if(!is.null(complexAnno)){
         NULL
