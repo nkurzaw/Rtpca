@@ -185,7 +185,7 @@ head(diffTpcaResultTable(diffTPCA) %>%
 ```
 
 We can see that none of these interactions is significant consiering the 
-multiple comparison we have done. Yet, we can look at the melting curves of 
+multiple comparisons we have done. Yet, we can look at the melting curves of 
 pairs like the "KPNA6:KPNB1" by evoking:
 
 ```{r}
