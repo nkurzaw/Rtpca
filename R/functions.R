@@ -112,7 +112,7 @@ runTPCA <- function(objList,
             p_adj_method = p_adj_method
         )
         if(doRocAnalysis){
-            message("\nPerformning Complex ROC analysis. \n")
+            message("\nPerforming Complex ROC analysis. \n")
             tpcaObj <- .createComplexRocTable(
                 tpcaObj = tpcaObj
             )
