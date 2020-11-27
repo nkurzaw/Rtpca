@@ -526,19 +526,20 @@ plotTpcaVolcano <- function(tpcaObj, alpha = 0.1){
     distMat[lower.tri(distMat)] <- NA
     
     distDf <- distMat %>% 
-        as.data.frame() %>% 
-        tibble::rownames_to_column() %>% 
-        as_tibble() %>% 
-        #mutate(rowname = rownames(distMat)) %>% 
+        as_tibble(rownames = "rowname") %>% 
         pivot_longer(
             cols = !starts_with("rowname"),
             names_to = "colname", 
             values_to = "value",
             values_drop_na = TRUE) %>% 
-        rowwise() %>% 
-        mutate(pair = paste(sort(c(rowname, colname)), 
-                            collapse = ":")) %>% 
-        ungroup %>% 
+        mutate(pair = ifelse(
+            rowname < colname, 
+            paste(rowname, colname, sep = ":"), 
+            paste(colname, rowname, sep = ":"))) %>%  
+        # rowwise() %>% 
+        # mutate(pair = paste(sort(c(rowname, colname)), 
+        #                     collapse = ":")) %>% 
+        # ungroup %>% 
         filter(rowname != colname,
                !duplicated(pair)) %>%
         arrange(value) %>% 
@@ -795,10 +796,13 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         as_tibble() %>% 
         mutate(rowname = rownames(dist_mat)) %>% 
         gather(key, value, -rowname) %>% 
-        rowwise %>% 
-        mutate(pair = paste(sort(c(rowname, key)), 
-                            collapse = ":")) %>% 
-        ungroup %>% 
+        # rowwise %>% 
+        # mutate(pair = paste(sort(c(rowname, key)), 
+        #                     collapse = ":")) %>% 
+        # ungroup %>% 
+        mutate(pair = ifelse(rowname < key, 
+                             paste(rowname, key, sep = ":"), 
+                             paste(key, rowname, sep = ":"))) %>% 
         filter(rowname != key, !duplicated(pair), 
                pair %in% ppi_anno$pair)
 }
@@ -819,9 +823,11 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
         mutate(rssC1 = valueC1^2,
                rssC2 = valueC2^2) %>% 
         mutate(rssC1_rssC2 = rssC1 - rssC2) %>% 
-        rowwise() %>% 
-        mutate(min_rssC1_rssC2 = min(c(rssC1, rssC2))) %>% 
-        ungroup %>% 
+        mutate(min_rssC1_rssC2 = 
+                   ifelse(rssC1 < rssC2, rssC1, rssC2)) %>% 
+        # rowwise() %>% 
+        # mutate(min_rssC1_rssC2 = min(c(rssC1, rssC2))) %>% 
+        # ungroup %>% 
         mutate(f_stat = abs(rssC1_rssC2)/min_rssC1_rssC2)
     
     return(combo_df)
@@ -837,9 +843,11 @@ plotComplexRoc <- function(tpcaObj, computeAUC = FALSE){
             y = sample(common_rownames, n + 100, replace = TRUE)
         ) %>% 
             filter(x!=y), n = n) %>% 
-        rowwise() %>% 
-        mutate(pair = paste(sort(c(x, y)), collapse = ":")) %>% 
-        ungroup 
+        mutate(pair = ifelse(
+            x < y, paste(x, y, sep = ":"), paste(y, x, sep = ":")))
+        # rowwise() %>% 
+        # mutate(pair = paste(sort(c(x, y)), collapse = ":")) %>% 
+        # ungroup 
     if(!is.null(ppi_anno)){
         random_prots <- 
             filter(random_prots, !pair %in% ppi_anno$pair)

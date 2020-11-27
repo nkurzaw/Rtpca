@@ -208,4 +208,8 @@ look at a more extensive example [here](https://github.com/nkurzaw/Rtpca_analysi
 sessionInfo()
 ```
 
+# Acknowledgements
+
+A big thanks to Thomas Naake and Mike Smith for helping with speeding up the code.
+
 # References
