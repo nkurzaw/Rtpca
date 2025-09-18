@@ -37,7 +37,7 @@ p1 <- plotPPiProfiles(tpcaObj1, pair = c("b", "d"))
 
 expect_equal(
     class(p1),
-    c("gg", "ggplot")
+    c("ggplot2::ggplot", "ggplot", "ggplot2::gg", "S7_object", "gg")
 )
 
 # objList is list of matrices
@@ -55,5 +55,5 @@ p2 <- plotPPiProfiles(tpcaObj2, pair = c("b", "d"))
 
 expect_equal(
     class(p2),
-    c("gg", "ggplot")
+    c("ggplot2::ggplot", "ggplot", "ggplot2::gg", "S7_object", "gg")
 )

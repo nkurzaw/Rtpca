@@ -19,5 +19,5 @@ p <- plotPPiRoc(tpcaTest)
 
 expect_equal(
     class(p),
-    c("gg", "ggplot")
+    c("ggplot2::ggplot", "ggplot", "ggplot2::gg", "S7_object", "gg")
 )

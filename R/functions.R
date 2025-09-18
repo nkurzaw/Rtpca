@@ -1200,7 +1200,7 @@ plotPPiProfiles <- function(tpcaObj, pair, splinesDf = 4){
         geom_smooth(method = "lm", 
                     aes(group = gene_name, color = gene_name),
                     formula = y ~ splines::ns(x, df = splinesDf),
-                    se = FALSE, size = 0.5) +
+                    se = FALSE, linewidth = 0.5) +
         facet_wrap(~condition) +
         scale_color_brewer("protein", palette = "Set1") +
         labs(y = "fraction non-denatured") +
